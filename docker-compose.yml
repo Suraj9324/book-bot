@@ -1,0 +1,98 @@
+# ══════════════════════════════════════════════════════════════
+# خلاصة الكتب — Docker Compose
+# ══════════════════════════════════════════════════════════════
+
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    # FIX-AUDIT: log rotation. الافتراضي json-file بدون حدود → الـ disk
+    # كان هيمتلي تدريجياً (~24MB/يوم على الإنتاج). الآن: max 50MB × 3 ملفات
+    # = 150MB سقف ثابت لكل container.
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # SECURITY: كلمة المرور تأتي من .env (POSTGRES_PASSWORD) — لا قيمة
+      # افتراضية ضعيفة في الـ repo. لو غير مُعرَّفة، compose سيفشل بـ
+      # warning واضح بدلاً من نشر deployment ضعيف.
+      DATABASE_URL: postgresql://bookbot:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@db:5432/bookbot
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+    volumes:
+      - bot_temp:/app/temp
+    ports:
+      # SECURITY: تُربَط الواجهة بـ 127.0.0.1 افتراضياً — الـ dashboard
+      # يجب أن يكون خلف reverse proxy (Nginx/Caddy) مع HTTPS وBasic Auth.
+      # للاستثناء (مثل local dev بدون proxy) اضبط: BOT_PORT_BIND=0.0.0.0
+      - "${BOT_PORT_BIND:-127.0.0.1}:5000:5000"
+    healthcheck:
+      # كان يفحص api.telegram.org → بطء/انقطاع Telegram يُعلَن البوت غير صحي
+      # ويُعاد تشغيله بلا داعٍ. الآن نفحص /api/health المحلي الذي يكشف
+      # حقيقة أن العملية شغّالة وتستجيب لـ HTTP.
+      # FIX-HEALTH: pgrep -fx (full + exact) للتطابق التام، يقلّل false-
+      # positives لو شيلين/scripts أخرى تحتوي السلسلة "node dist/index.cjs".
+      test: ["CMD-SHELL", "pgrep -fx 'node dist/index.cjs' >/dev/null && wget -q --spider --timeout=5 http://127.0.0.1:5000/api/health"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    environment:
+      POSTGRES_USER: bookbot
+      # SECURITY: لا قيمة افتراضية — لو POSTGRES_PASSWORD غير مُعرَّفة في .env
+      # سيفشل compose مبكّراً بدل ما يعمل deploy بكلمة مرور افتراضية ضعيفة.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: bookbot
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # SECURITY: لا host port binding — DB متاحة فقط داخل شبكة Docker للـ bot.
+    # لو احتجت psql محلي للتشخيص استعمل: docker compose exec db psql -U bookbot
+    # أو فعّل الـ port مؤقتاً عبر docker-compose.override.yml.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookbot -d bookbot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    # SECURITY: لا host port binding — Redis متاح فقط داخل شبكة Docker.
+    # للتشخيص: docker compose exec redis redis-cli
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+    external: true
+    name: book-bot_pgdata
+  redis_data:
+  bot_temp:

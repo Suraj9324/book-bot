@@ -1,0 +1,381 @@
+// ══════════════════════════════════════════════════════════
+// Admin Agent — dynamic LLM provider config
+// ══════════════════════════════════════════════════════════
+// Lets the admin hot-swap LLM providers (Cerebras/Groq/OpenAI/Anthropic/
+// OpenRouter/…) from Telegram chat without redeploying.
+//
+// Storage: Redis hash `admin:agent:llm_providers` (field=id, value=JSON).
+// Priority is encoded inside the value so a single HGETALL retrieves
+// everything in one round-trip.
+//
+// Fallback: when the hash is empty (fresh install), DEFAULT_PROVIDERS
+// is used. Defaults are derived from process.env so existing CEREBRAS_API_KEY
+// / GROQ_API_KEY keep working without any migration.
+//
+// Keys are always masked in any return value (last 4 chars only).
+
+import { redis } from "../redis.js";
+import {
+  CEREBRAS_API_KEY,
+  GROQ_API_KEY,
+  CLOUDFLARE_AI_ACCOUNT_ID,
+  CLOUDFLARE_AI_API_TOKEN,
+  AGENTROUTER_API_KEY,
+} from "../config.js";
+import { L } from "../logger.js";
+
+const HASH_KEY = "admin:agent:llm_providers";
+
+export interface LLMProvider {
+  /** Stable ID (e.g. "cerebras-gpt-oss-120b", "openai-gpt-4o-mini"). */
+  id:       string;
+  /** Display label (e.g. "Cerebras GPT-OSS 120B"). */
+  name:     string;
+  /** Base URL for the OpenAI-compatible API (no trailing slash, no /chat/completions). */
+  baseUrl:  string;
+  /** Model name to send in the `model` field. */
+  model:    string;
+  /** API key (stored encrypted-at-rest in Redis would be ideal; for now plain). */
+  apiKey:   string;
+  /** Lower number = higher priority. Defaults: cloudflare=1, cerebras=2, groq-oss=3, groq-llama=4. */
+  priority: number;
+  /** Set to false to keep the row but skip during dispatch. */
+  enabled:  boolean;
+  /** Last time the dispatcher used this provider successfully. */
+  lastUsedAt?: number;
+}
+
+// ── built-in defaults ─────────────────────────────────────
+// These exist so the admin agent works out-of-the-box with the
+// existing CEREBRAS_API_KEY / GROQ_API_KEY env vars. The admin can
+// overwrite or extend at runtime via tools.
+
+/** Stable ID for the Cloudflare provider — referenced by the upsert
+ * migration so existing Redis-seeded installs gain Cloudflare as
+ * primary without resetting admin customisations. */
+export const CLOUDFLARE_PROVIDER_ID = "cloudflare-llama-3.3-70b";
+
+/** Current Cloudflare model id. Llama 3.3 70B FP8 fast: fast (fp8
+ * quantization), supports function calling on the OpenAI-compat
+ * endpoint, and unlike `@cf/openai/gpt-oss-120b` does not require
+ * Workers-AI Run / Responses format (that endpoint's validator
+ * rejects assistant messages with tool_calls, causing HTTP 400 for
+ * any multi-turn tool conversation). */
+export const CLOUDFLARE_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+export const CLOUDFLARE_NAME  = "Cloudflare Llama 3.3 70B FP8";
+
+/** Legacy provider/model identifiers that were tried earlier — the
+ * migration auto-rewrites these so prod installs don't get stuck on
+ * the broken row after upgrade. */
+const CLOUDFLARE_LEGACY_IDS    = ["cloudflare-gpt-oss-120b"];
+const CLOUDFLARE_LEGACY_MODELS = ["@cf/openai/gpt-oss-120b"];
+
+// ── AgentRouter (agentrouter.org) — multi-model paid router ───────
+// OpenAI-compatible endpoint at https://agentrouter.org/v1 fronting Claude /
+// DeepSeek / GLM with a single API key. Wired in priority 2–6 so they kick in
+// as paid fallbacks the moment Cloudflare returns a 5xx or quota-exhaust
+// error. Order is fastest/cheapest → strongest, so failover stays quick and
+// only escalates to Opus when everything else is busted.
+const AGENTROUTER_BASE_URL = "https://agentrouter.org/v1";
+const AGENTROUTER_NAME_PREFIX = "AgentRouter";
+
+interface AgentRouterSpec {
+  /** Stable provider id used in the Redis hash. */
+  id:       string;
+  /** Display label shown in admin tools (no API key leakage). */
+  name:     string;
+  /** Model string sent in the OpenAI `model` field. */
+  model:    string;
+  /** Lower = tried first inside the agentrouter band. */
+  priority: number;
+}
+
+export const AGENTROUTER_MODELS: ReadonlyArray<AgentRouterSpec> = [
+  { id: "agentrouter-deepseek-v4-flash",     name: `${AGENTROUTER_NAME_PREFIX} DeepSeek V4 Flash`,  model: "deepseek-v4-flash",             priority: 2 },
+  { id: "agentrouter-glm-5.1",               name: `${AGENTROUTER_NAME_PREFIX} GLM 5.1`,            model: "glm-5.1",                       priority: 3 },
+  { id: "agentrouter-claude-haiku-4-5",      name: `${AGENTROUTER_NAME_PREFIX} Claude Haiku 4.5`,   model: "claude-haiku-4-5-20251001",     priority: 4 },
+  { id: "agentrouter-deepseek-v4-pro",       name: `${AGENTROUTER_NAME_PREFIX} DeepSeek V4 Pro`,    model: "deepseek-v4-pro",               priority: 5 },
+  { id: "agentrouter-claude-opus-4-6",       name: `${AGENTROUTER_NAME_PREFIX} Claude Opus 4.6`,    model: "claude-opus-4-6",               priority: 6 },
+];
+
+/** Stable id of the cheapest/fastest agentrouter model — used as the
+ * canonical reference when a migration needs to drop in *one* row at a
+ * known priority slot. */
+export const AGENTROUTER_PRIMARY_ID = AGENTROUTER_MODELS[0].id;
+
+function buildAgentRouterProvider(spec: AgentRouterSpec): LLMProvider {
+  return {
+    id:       spec.id,
+    name:     spec.name,
+    baseUrl:  AGENTROUTER_BASE_URL,
+    model:    spec.model,
+    apiKey:   AGENTROUTER_API_KEY,
+    priority: spec.priority,
+    enabled:  true,
+  };
+}
+
+/** Build the Cloudflare provider object. Account id is interpolated
+ * into the baseUrl because Cloudflare's OpenAI-compat endpoint is
+ * scoped per-account: `/client/v4/accounts/{ACCOUNT_ID}/ai/v1`. */
+function buildCloudflareProvider(priority: number): LLMProvider {
+  return {
+    id:       CLOUDFLARE_PROVIDER_ID,
+    name:     CLOUDFLARE_NAME,
+    baseUrl:  `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_AI_ACCOUNT_ID}/ai/v1`,
+    model:    CLOUDFLARE_MODEL,
+    apiKey:   CLOUDFLARE_AI_API_TOKEN,
+    priority,
+    enabled:  true,
+  };
+}
+
+export const DEFAULT_PROVIDERS: LLMProvider[] = [
+  // Cloudflare Workers AI — primary. Same gpt-oss-120b model as Cerebras
+  // but with much higher daily quota (~10k neurons free + cheap pay-as-you-go)
+  // and supports function calling on the OpenAI-compat /v1/chat/completions
+  // endpoint.
+  buildCloudflareProvider(1),
+  // AgentRouter — paid multi-model fallback band (priorities 2–6).
+  // Tried fastest/cheapest first; escalates to Claude Opus only if everything
+  // upstream is exhausted.
+  ...AGENTROUTER_MODELS.map(buildAgentRouterProvider),
+  {
+    id:       "cerebras-gpt-oss-120b",
+    name:     "Cerebras GPT-OSS 120B",
+    baseUrl:  "https://api.cerebras.ai/v1",
+    model:    "gpt-oss-120b",
+    apiKey:   CEREBRAS_API_KEY,
+    priority: 7,
+    enabled:  true,
+  },
+  {
+    id:       "groq-gpt-oss-120b",
+    name:     "Groq GPT-OSS 120B",
+    baseUrl:  "https://api.groq.com/openai/v1",
+    model:    "openai/gpt-oss-120b",
+    apiKey:   GROQ_API_KEY,
+    priority: 8,
+    enabled:  true,
+  },
+  {
+    id:       "groq-llama-3.3-70b",
+    name:     "Groq Llama 3.3 70B",
+    baseUrl:  "https://api.groq.com/openai/v1",
+    model:    "llama-3.3-70b-versatile",
+    apiKey:   GROQ_API_KEY,
+    priority: 9,
+    enabled:  true,
+  },
+];
+
+// ── core CRUD ─────────────────────────────────────────────
+
+/** Returns providers sorted by priority asc (1 first). Skips disabled / no-key. */
+export async function loadProviders(): Promise<LLMProvider[]> {
+  const all = await loadAllProvidersRaw();
+  return all
+    .filter(p => p.enabled && p.apiKey && p.apiKey.length > 5)
+    .sort((a, b) => a.priority - b.priority);
+}
+
+/** Returns *all* providers (incl. disabled / missing key). For listing. */
+export async function loadAllProvidersRaw(): Promise<LLMProvider[]> {
+  const raw = await redis.hgetall(HASH_KEY).catch(() => ({} as Record<string, string>));
+  if (raw && Object.keys(raw).length > 0) {
+    const out: LLMProvider[] = [];
+    for (const [id, json] of Object.entries(raw)) {
+      try {
+        const p = JSON.parse(json) as LLMProvider;
+        if (p.id) out.push(p);
+        else      out.push({ ...p, id });
+      } catch { /* skip malformed row */ }
+    }
+    return out.sort((a, b) => a.priority - b.priority);
+  }
+  // Hash empty → use defaults (env-backed)
+  return DEFAULT_PROVIDERS.filter(p => p.apiKey && p.apiKey.length > 5);
+}
+
+export async function setProvider(p: LLMProvider): Promise<void> {
+  if (!p.id) throw new Error("provider id required");
+  await redis.hset(HASH_KEY, p.id, JSON.stringify(p));
+}
+
+export async function removeProvider(id: string): Promise<boolean> {
+  const n = await redis.hdel(HASH_KEY, id);
+  return n > 0;
+}
+
+export async function getProvider(id: string): Promise<LLMProvider | null> {
+  const raw = await redis.hget(HASH_KEY, id);
+  if (!raw) return null;
+  try { return JSON.parse(raw) as LLMProvider; } catch { return null; }
+}
+
+export async function markUsed(id: string): Promise<void> {
+  // Fire-and-forget. Update `lastUsedAt` for observability — don't fail
+  // dispatch if Redis blips.
+  try {
+    const p = await getProvider(id);
+    if (p) {
+      p.lastUsedAt = Date.now();
+      await setProvider(p);
+    }
+  } catch { /* swallow */ }
+}
+
+// ── safety: mask keys before returning to LLM/admin ───────
+
+export function maskKey(key: string): string {
+  if (!key) return "(none)";
+  if (key.length <= 8) return "****";
+  return `${key.slice(0, 4)}...${key.slice(-4)}`;
+}
+
+export function publicView(p: LLMProvider): Omit<LLMProvider, "apiKey"> & { apiKeyMasked: string } {
+  const { apiKey, ...rest } = p;
+  return { ...rest, apiKeyMasked: maskKey(apiKey) };
+}
+
+// ── seeding ───────────────────────────────────────────────
+
+/**
+ * On first boot, if the hash is empty but DEFAULT_PROVIDERS have keys,
+ * write them to Redis so the admin sees them in `list_llm_providers`
+ * and can edit/reorder. Idempotent — only seeds when hash is truly empty.
+ */
+export async function seedDefaultsIfEmpty(): Promise<{ seeded: number }> {
+  const n = await redis.hlen(HASH_KEY).catch(() => 0);
+  if (n > 0) return { seeded: 0 };
+  let seeded = 0;
+  for (const p of DEFAULT_PROVIDERS) {
+    if (p.apiKey && p.apiKey.length > 5) {
+      await setProvider(p);
+      seeded++;
+    }
+  }
+  return { seeded };
+}
+
+/**
+ * Idempotent migration: ensures the Cloudflare provider exists in Redis
+ * at priority 1 (or below the lowest existing priority, whichever is
+ * smaller) so prod installs that were seeded before Cloudflare was a
+ * default still gain it as primary on the next boot.
+ *
+ * Does NOT touch any existing Cloudflare row — if the admin already
+ * configured one (any priority/key), this is a no-op so admin
+ * customisations stick.
+ *
+ * Returns:
+ *   added=true   — row was inserted (Cloudflare keys present, row was missing)
+ *   skipped="no_keys"     — CF_ACCOUNT_ID or CF_API_TOKEN missing
+ *   skipped="already_set" — admin already has a Cloudflare row
+ */
+export async function ensureCloudflarePrimary(): Promise<
+  | { added:   true;  priority: number }
+  | { added:   false; reason: "no_keys" }
+  | { added:   false; reason: "already_set" }
+  | { added:   false; reason: "model_migrated"; from: string; to: string }
+  | { added:   false; reason: "id_migrated";    fromId: string; toId: string }
+> {
+  if (!CLOUDFLARE_AI_ACCOUNT_ID || !CLOUDFLARE_AI_API_TOKEN) {
+    return { added: false, reason: "no_keys" };
+  }
+
+  // ── (1) Legacy-ID migration ────────────────────────────────────
+  // Old installs (PR #148) used CLOUDFLARE_PROVIDER_ID =
+  // "cloudflare-gpt-oss-120b". We renamed it because the model
+  // changed — rewrite under the new ID, preserving priority and
+  // any admin-overridden apiKey, then drop the old row.
+  for (const legacyId of CLOUDFLARE_LEGACY_IDS) {
+    if (legacyId === CLOUDFLARE_PROVIDER_ID) continue;
+    const legacyRow = await getProvider(legacyId).catch(() => null);
+    if (legacyRow) {
+      const migrated: LLMProvider = {
+        ...legacyRow,
+        id:    CLOUDFLARE_PROVIDER_ID,
+        name:  CLOUDFLARE_NAME,
+        model: CLOUDFLARE_MODEL,
+        // Keep admin-overridden apiKey if it differs from the env var.
+        apiKey: legacyRow.apiKey || CLOUDFLARE_AI_API_TOKEN,
+      };
+      await setProvider(migrated);
+      await removeProvider(legacyId);
+      L.info(
+        "adminAgent",
+        `Cloudflare provider id migrated: ${legacyId} → ${CLOUDFLARE_PROVIDER_ID} (model ${legacyRow.model} → ${CLOUDFLARE_MODEL})`,
+      );
+      return { added: false, reason: "id_migrated", fromId: legacyId, toId: CLOUDFLARE_PROVIDER_ID };
+    }
+  }
+
+  // ── (2) Model migration ────────────────────────────────────────
+  // Same-ID row exists but model is one we know is broken on CF's
+  // compat endpoint — auto-update it. Keep priority and apiKey.
+  const existing = await getProvider(CLOUDFLARE_PROVIDER_ID).catch(() => null);
+  if (existing) {
+    if (CLOUDFLARE_LEGACY_MODELS.includes(existing.model)) {
+      const migrated: LLMProvider = {
+        ...existing,
+        name:  CLOUDFLARE_NAME,
+        model: CLOUDFLARE_MODEL,
+      };
+      await setProvider(migrated);
+      L.info(
+        "adminAgent",
+        `Cloudflare model migrated: ${existing.model} → ${CLOUDFLARE_MODEL}`,
+      );
+      return { added: false, reason: "model_migrated", from: existing.model, to: CLOUDFLARE_MODEL };
+    }
+    return { added: false, reason: "already_set" };
+  }
+
+  // ── (3) Fresh insert ───────────────────────────────────────────
+  // Pick priority = min(1, lowestExistingPriority - 1) so we always land
+  // ahead of whatever the admin currently has, even if they manually
+  // re-prioritised cerebras to 0.
+  const all = await loadAllProvidersRaw().catch(() => [] as LLMProvider[]);
+  const minExisting = all.reduce((m, p) => Math.min(m, p.priority), Number.POSITIVE_INFINITY);
+  const priority = Number.isFinite(minExisting) ? Math.min(1, minExisting - 1) : 1;
+
+  const provider = buildCloudflareProvider(priority);
+  await setProvider(provider);
+  L.info("adminAgent", `Cloudflare provider upserted at priority ${priority}`);
+  return { added: true, priority };
+}
+
+/**
+ * Idempotent migration: inserts the AgentRouter (agentrouter.org) provider
+ * rows for any model in AGENTROUTER_MODELS that the admin doesn't already
+ * have. Lets prod installs that were seeded before AgentRouter shipped pick
+ * up the new fallback band on next boot without a Redis wipe.
+ *
+ * Each model is skipped independently — if admin already has a row for
+ * (id), it's left untouched even if priority/key differ. Net-new rows use
+ * the spec's default priority.
+ *
+ * Returns the list of stable ids that were added (empty when AGENTROUTER_API_KEY
+ * is missing or every model is already configured).
+ */
+export async function ensureAgentRouterProviders(): Promise<{ added: string[]; reason?: "no_keys" | "already_set" }> {
+  if (!AGENTROUTER_API_KEY) {
+    return { added: [], reason: "no_keys" };
+  }
+  const added: string[] = [];
+  for (const spec of AGENTROUTER_MODELS) {
+    const existing = await getProvider(spec.id).catch(() => null);
+    if (existing) continue;
+    await setProvider(buildAgentRouterProvider(spec));
+    added.push(spec.id);
+  }
+  if (added.length === 0) {
+    return { added, reason: "already_set" };
+  }
+  L.info(
+    "adminAgent",
+    `AgentRouter providers upserted: ${added.length} model(s) at priorities ${AGENTROUTER_MODELS.filter(s => added.includes(s.id)).map(s => s.priority).join(",")}`,
+  );
+  return { added };
+}

@@ -1,0 +1,78 @@
+import type { Request, Response, NextFunction } from "express";
+import { redis } from "./redis.js";
+import { L } from "./logger.js";
+
+// ══════════════════════════════════════════════
+// IP RATE LIMIT — حماية للـ APIs العامة
+//
+// نفس نمط server/bot/rateLimit.ts (Lua sliding window) لكن مفتاحه IP بدل
+// userId. الفرق المهم: هنا نفحص أولاً ولا نُضيف لو تجاوز الحد، عشان
+// المستخدم المُسيء ما يطيلش فترة الحظر بنفسه (انظر H3 fix).
+// ══════════════════════════════════════════════
+
+// IMPORTANT: `rand` arrives from Node, NOT generated inside Lua.
+// Redis resets the Lua RNG seed before every EVAL for determinism, so
+// `math.random()` would return the SAME value on every invocation.
+// Combined with millisecond-precision `now`, two concurrent requests
+// landing in the same millisecond would produce identical ZSET members,
+// the second ZADD would be a no-op, and the limiter would silently let
+// extra requests through. Generating the random in Node (Math.random,
+// system-seeded) makes every member unique. Same fix as rateLimit.ts:30.
+const slidingWindowGuardLua = `
+local key    = KEYS[1]
+local now    = tonumber(ARGV[1])
+local window = tonumber(ARGV[2])
+local limit  = tonumber(ARGV[3])
+local rand   = ARGV[4]
+local min    = now - window
+redis.call("ZREMRANGEBYSCORE", key, "-inf", min)
+local count = redis.call("ZCARD", key)
+if count >= limit then
+  return -1
+end
+redis.call("ZADD", key, now, tostring(now) .. "-" .. rand)
+redis.call("PEXPIRE", key, window)
+return count + 1
+`;
+
+interface IpLimitOpts {
+  /** مفتاح route للتمييز بين endpoints مختلفة */
+  prefix: string;
+  /** أقصى عدد طلبات في النافذة */
+  max: number;
+  /** عرض النافذة بالميلي ثانية */
+  windowMs: number;
+}
+
+function clientIp(req: Request): string {
+  // Express يضبط req.ip من x-forwarded-for لو trust proxy مفعّل
+  // وإلا يأخذ socket.remoteAddress مباشرة. كلاهما يكفي كمفتاح limiter.
+  return (req.ip || req.socket.remoteAddress || "unknown").replace(/^::ffff:/, "");
+}
+
+export function ipRateLimit(opts: IpLimitOpts) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const ip = clientIp(req);
+    const key = `rl:ip:${opts.prefix}:${ip}`;
+    let result: number;
+    try {
+      result = await (redis as any).eval(
+        slidingWindowGuardLua, 1, key,
+        String(Date.now()), String(opts.windowMs), String(opts.max),
+        String(Math.floor(Math.random() * 1_000_000)),
+      ) as number;
+    } catch (e) {
+      // fail-open على فشل Redis كي لا نقطع الخدمة بسبب مشكلة اتصال
+      L.warn("ipRateLimit", "redis error — failing open", { err: String(e).slice(0, 80) });
+      return next();
+    }
+    if (result === -1) {
+      res.status(429).json({
+        ok: false,
+        error: `Too many requests — max ${opts.max} per ${Math.round(opts.windowMs / 1000)}s`,
+      });
+      return;
+    }
+    next();
+  };
+}

@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>خلاصة الكتب · مركز العمليات</title>
+<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#06080e;--bg-elevated:#0a0e16;--surface:#0d121b;--surface-2:#121826;
+  --card:#141b27;--card-hover:#1a2332;--border:#1c2536;--border-strong:#2a3650;
+  --gold:#e0b04a;--gold-soft:#d4a843;--gold-dim:#8a6a22;--gold-glow:rgba(224,176,74,.18);
+  --green:#3ecf8e;--green-dim:#134e37;--red:#ff6b6b;--red-dim:#4a1d1d;
+  --blue:#5b9dff;--blue-dim:#16325c;--purple:#b794f6;--orange:#f0a04b;
+  --text:#edf2f7;--text-mid:#a8b3c4;--muted:#6b778c;--dim:#2a3344;
+  --radius:14px;--radius-sm:10px;--shadow:0 8px 32px rgba(0,0,0,.35);
+  --shadow-lg:0 16px 48px rgba(0,0,0,.45);
+  --font-ar:'Noto Kufi Arabic',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ar);overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{background:radial-gradient(1200px 600px at 100% -10%,rgba(224,176,74,.07),transparent 55%),radial-gradient(900px 500px at 0% 100%,rgba(91,157,255,.05),transparent 50%),var(--bg)}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--dim);border-radius:99px}::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+.mono{font-family:var(--font-mono)!important;direction:ltr;display:inline-block;letter-spacing:.02em}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 1px rgba(224,176,74,.25),0 0 12px rgba(224,176,74,.12)}50%{box-shadow:0 0 0 1px rgba(224,176,74,.45),0 0 28px rgba(224,176,74,.22)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{transform:translateX(100%);opacity:.6}to{transform:translateX(0);opacity:1}}
+@keyframes shimmer{0%{background-position:-420px 0}100%{background-position:420px 0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}.glow{animation:glow 2.8s ease-in-out infinite}
+.fade-up{animation:fadeUp .35s cubic-bezier(.22,1,.36,1) forwards}.fade-in{animation:fadeIn .28s ease forwards}
+.slide-right{animation:slideRight .28s cubic-bezier(.4,0,.2,1) forwards}
+.shimmer{background:linear-gradient(90deg,var(--dim) 20%,var(--border) 45%,var(--dim) 70%);background-size:420px 100%;animation:shimmer 1.35s infinite linear}
+.ui-card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 40%),var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 1px 0 rgba(255,255,255,.03) inset;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s}
+.ui-card.hcard:hover,.hcard:hover{background:var(--card-hover)!important;border-color:var(--border-strong)!important;transform:translateY(-1px);box-shadow:var(--shadow)}
+table{border-collapse:separate;border-spacing:0;width:100%}
+th,td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--border)}
+th{font-size:11px;font-weight:700;color:var(--muted);background:rgba(0,0,0,.18);position:sticky;top:0;z-index:1}
+tr:hover td{background:rgba(224,176,74,.03)}td{font-size:13px;color:var(--text-mid)}
+input,select,textarea{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 14px;font-family:inherit;font-size:13px;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:rgba(224,176,74,.55);box-shadow:0 0 0 3px var(--gold-glow)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+button{cursor:pointer;font-family:var(--font-ar);transition:all .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;font-weight:600;border:1px solid transparent;white-space:nowrap;user-select:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-sm{padding:5px 11px;font-size:11px}.btn-md{padding:8px 16px;font-size:13px}.btn-lg{padding:12px 22px;font-size:14px}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--text-mid)}
+.btn-ghost:hover{border-color:var(--border-strong);color:var(--text);background:rgba(255,255,255,.02)}
+.btn-gold{background:linear-gradient(135deg,#9a7424,var(--gold));border-color:transparent;color:#1a1205;box-shadow:0 4px 16px rgba(224,176,74,.2)}
+.btn-gold:hover{filter:brightness(1.06);box-shadow:0 6px 22px rgba(224,176,74,.3)}
+.btn-danger{background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.35);color:var(--red)}
+.btn-success{background:rgba(62,207,142,.1);border-color:rgba(62,207,142,.35);color:var(--green)}
+.btn-blue{background:rgba(91,157,255,.1);border-color:rgba(91,157,255,.35);color:var(--blue)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+#root{display:flex;height:100vh}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.section-title{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;color:var(--text)}
+.section-title .ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(224,176,74,.1);border:1px solid rgba(224,176,74,.2);font-size:16px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state .big{font-size:36px;margin-bottom:10px;opacity:.85}
+.empty-state h3{color:var(--text-mid);font-size:15px;margin-bottom:6px}
+.empty-state p{font-size:12px;line-height:1.7;max-width:320px;margin:0 auto}
+.sidebar{background:linear-gradient(180deg,rgba(224,176,74,.03),transparent 120px),var(--surface);border-left:1px solid var(--border)}
+.nav-item{background:transparent;border:1px solid transparent;color:var(--muted);padding:10px 12px;border-radius:11px;display:flex;align-items:center;gap:10px;width:100%;text-align:right;transition:all .15s;font-size:13px}
+.nav-item:hover{background:rgba(255,255,255,.03);color:var(--text-mid)}
+.nav-item.active{background:linear-gradient(90deg,rgba(224,176,74,.14),rgba(224,176,74,.04));border-color:rgba(224,176,74,.28);color:var(--gold);font-weight:700}
+.nav-group-label{font-size:10px;font-weight:700;color:var(--muted);padding:14px 12px 6px;letter-spacing:.06em;opacity:.8}
+.topbar{background:rgba(13,18,27,.82)!important;backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid var(--border)!important;box-shadow:0 1px 0 rgba(255,255,255,.02)}
+.login-shell{min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+.login-shell::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 70% 20%,rgba(224,176,74,.12),transparent 40%),radial-gradient(circle at 20% 80%,rgba(91,157,255,.08),transparent 35%);animation:float 8s ease-in-out infinite;pointer-events:none}
+.login-card{width:100%;max-width:420px;background:linear-gradient(165deg,rgba(255,255,255,.04),transparent 50%),var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px;box-shadow:var(--shadow-lg);position:relative;z-index:1}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:14px;font-size:13px;font-weight:600;z-index:9999;display:flex;align-items:center;gap:8px;background:var(--card);box-shadow:var(--shadow-lg);backdrop-filter:blur(12px)}
+.content{padding:24px 22px!important}
+.mobile-only{display:none}.desktop-only{display:flex}
+@media (max-width:768px){
+  .mobile-only{display:flex}.desktop-only{display:none}
+  .sidebar{position:fixed!important;right:0;top:0;height:100vh!important;z-index:200;box-shadow:-12px 0 40px rgba(0,0,0,.55);transition:transform .28s cubic-bezier(.4,0,.2,1)!important}
+  .sidebar.closed{transform:translateX(110%)}
+  .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;animation:fadeIn .2s;backdrop-filter:blur(2px)}
+  .content{padding:14px 12px!important}.topbar{padding:0 12px!important;height:54px!important}
+  .topbar-title{font-size:14px!important}
+  .kpi-grid{gap:8px!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important}
+  table{font-size:12px}th,td{padding:8px}.login-card{padding:28px 20px}
+}
+@media (max-width:480px){.topbar-status{display:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ══════════════════════════════════════════════
+// CONFIG — يُقرأ تلقائياً من نفس السيرفر
+// ══════════════════════════════════════════════
+// SECURITY: لا نحتفظ بأي token في الـ source. التوكن يُدخَل عبر شاشة
+// تسجيل دخول ويُحفَظ في localStorage، فلا يظهر في View Source.
+const TOKEN_KEY = "bookbot_dash_secret";
+function getToken(){ try { return localStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; } }
+function setToken(t){ try { t ? localStorage.setItem(TOKEN_KEY,t) : localStorage.removeItem(TOKEN_KEY); } catch {} }
+
+const API_BASE = "";   // نفس الـ origin دائماً — لا mixed content
+const REFRESH  = 30000;
+
+// ══════════════════════════════════════════════
+// MOCK DATA
+// ══════════════════════════════════════════════
+const MOCK = {
+  today:{date:new Date().toISOString().slice(0,10),searches:847,downloads:621,success:574,fail:47,cacheHits:198,successRate:"92.4%",cacheRate:"31.9%",avgMs:3840,activeUsers:312},
+  total:{totalSearches:48291,totalDownloads:34872},
+  queue:{highQueue:2,normalQueue:11,dlqSize:3,totalActiveJobs:13},
+  premium:{count:47},banned:{count:8},
+  blacklist:{total:234,active:189},
+  system:{uptimeHuman:"5ي 0س 0د",maintenance:false,redis:true,memory:{heapUsed:142,heapTotal:256,rss:310},workers:4,nodeVersion:"v20.11.0",pid:1337},
+  weekly:[
+    {date:"02-28",searches:620,downloads:441,success:398,fail:43,cacheHits:112,activeUsers:201,avgMs:4200},
+    {date:"03-01",searches:710,downloads:523,success:489,fail:34,cacheHits:154,activeUsers:267,avgMs:3900},
+    {date:"03-02",searches:530,downloads:389,success:351,fail:38,cacheHits:98, activeUsers:178,avgMs:4100},
+    {date:"03-03",searches:890,downloads:671,success:623,fail:48,cacheHits:201,activeUsers:341,avgMs:3600},
+    {date:"03-04",searches:780,downloads:590,success:552,fail:38,cacheHits:175,activeUsers:298,avgMs:3750},
+    {date:"03-05",searches:910,downloads:688,success:641,fail:47,cacheHits:212,activeUsers:365,avgMs:3500},
+    {date:"03-06",searches:847,downloads:621,success:574,fail:47,cacheHits:198,activeUsers:312,avgMs:3840},
+  ],
+  topBooks:[
+    {title:"أرض زيكولا",count:89},{title:"الأمير الصغير",count:76},{title:"عزازيل",count:71},
+    {title:"زقاق المدق",count:68},{title:"قواعد العشق الأربعون",count:52},{title:"موبي ديك",count:47},
+    {title:"فرانكنشتاين في بغداد",count:43},{title:"مائة عام من العزلة",count:38},
+  ],
+  sources:[
+    {domain:"archive.org",ok:187,fail:9,rate:"95%"},{domain:"foulabook.com",ok:143,fail:21,rate:"87%"},
+    {domain:"noor-book.com",ok:112,fail:18,rate:"86%"},{domain:"pdfdrive.com",ok:98,fail:34,rate:"74%"},
+    {domain:"z-lib.org",ok:76,fail:42,rate:"64%"},{domain:"kotobati.com",ok:54,fail:28,rate:"66%"},
+  ],
+  dlqJobs:[
+    {bookName:"كتاب النجاح",userId:"112233445",failReason:"PDF download timeout 30s",createdAt:Date.now()-120000},
+    {bookName:"مختصر المفيد",userId:"998877665",failReason:"All sources returned 404",createdAt:Date.now()-300000},
+    {bookName:"مقدمة ابن خلدون",userId:"554433221",failReason:"File size exceeded 50MB",createdAt:Date.now()-600000},
+  ],
+  premiumUsers:["112233445","998877665","443322110","556677889","112299334"],
+  bannedUsers:["909090909","111222333"],
+};
+
+// ══════════════════════════════════════════════
+// API LAYER
+// ══════════════════════════════════════════════
+let _mock = false;
+
+// onAuthLost: callback that App.tsx registers — fires on 401/403 to redirect to Login
+let _onAuthLost = ()=>{};
+function setAuthLostHandler(fn){ _onAuthLost = fn || (()=>{}); }
+
+async function apiFetch(path, opts={}) {
+  const url = `${API_BASE}/api/admin/${path}`;
+  const token = getToken();
+  if(!token){ _mock = true; _onAuthLost(); return null; }
+  try {
+    const r = await fetch(url,{...opts,headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json",...(opts.headers||{})}});
+    if(r.status===401 || r.status===403){
+      // token خاطئ أو فقد صلاحيته — رجّع للـ login
+      setToken("");
+      _onAuthLost();
+      _mock = true;
+      return null;
+    }
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    _mock = false;
+    return j.data ?? j;
+  } catch(e) {
+    _mock = true;
+    return null;
+  }
+}
+async function apiAct(method,path,body){
+  await apiFetch(path,{method,body:body?JSON.stringify(body):undefined});
+  return true;
+}
+function _norm(d){
+  if(!d) return d;
+  // total: API returns {searches,downloads,users}; UI wants {totalSearches,totalDownloads}
+  if(d.total){
+    d.total.totalSearches  = d.total.totalSearches  ?? d.total.searches  ?? 0;
+    d.total.totalDownloads = d.total.totalDownloads ?? d.total.downloads ?? 0;
+  }
+  // today: derive missing fields
+  if(d.today){
+    d.today.success      = d.today.success      ?? d.today.found        ?? 0;
+    d.today.fail         = d.today.fail         ?? Math.max(0,(d.today.searches||0)-(d.today.success||0));
+    d.today.cacheHits    = d.today.cacheHits    ?? d.today.cache_hits    ?? 0;
+    d.today.cacheRate    = d.today.cacheRate    ?? (d.today.searches>0?((d.today.cacheHits/d.today.searches)*100).toFixed(1)+"%":"0%");
+    d.today.successRate  = d.today.successRate  ?? (d.today.searches>0?((d.today.success/d.today.searches)*100).toFixed(1)+"%":"0%");
+    d.today.activeUsers  = d.today.activeUsers  ?? d.today.users         ?? 0;
+    d.today.avgMs        = d.today.avgMs        ?? d.today.avg_ms        ?? 0;
+  }
+  // weekly: API returns object {date: {...}}; UI wants array [{date,...}]
+  if(d.weekly && !Array.isArray(d.weekly)){
+    d.weekly = Object.entries(d.weekly).map(([date,v])=>({
+      date: date.slice(5),
+      searches: v.searches||0,
+      downloads: v.downloads||0,
+      success: v.found??v.success??0,
+      fail: Math.max(0,(v.searches||0)-(v.found??v.success??0)),
+      cacheHits: v.cacheHits||v.cache_hits||0,
+      activeUsers: v.activeUsers||v.users||0,
+      avgMs: v.avgMs||v.avg_ms||0,
+    })).sort((a,b)=>a.date.localeCompare(b.date));
+  }
+  return d;
+}
+async function loadOv(){
+  const d=await apiFetch("overview");
+  if(d) return _norm(d);
+  return {today:MOCK.today,total:MOCK.total,queue:MOCK.queue,premium:MOCK.premium,
+          banned:MOCK.banned,blacklist:MOCK.blacklist,system:MOCK.system,weekly:MOCK.weekly};
+}
+async function loadBooks()  {
+  const r = await apiFetch("stats/top-books?limit=15");
+  if(!r) return MOCK.topBooks;
+  // API returns [{book,count}]; UI wants [{title,count}]
+  return r.map(x=>({title: x.title ?? x.book ?? "—", count: x.count||0}));
+}
+async function loadSrc()    { return (await apiFetch("stats/sources"))            ?? MOCK.sources; }
+async function loadDLQ()    { return (await apiFetch("queue/dlq?limit=30"))        ?? MOCK.dlqJobs; }
+async function loadPrem()   { return (await apiFetch("users/premium"))             ?? MOCK.premiumUsers; }
+async function loadBanned() { return (await apiFetch("users/banned"))              ?? MOCK.bannedUsers; }
+async function loadFunnel() { return (await apiFetch("telemetry/funnel"))           ?? null; }
+async function loadTraces() { return (await apiFetch("telemetry/traces?limit=30"))  ?? []; }
+// DASH 2.0
+async function loadLogs(limit=200,level)  {
+  const q = `system/logs?limit=${limit}${level?`&level=${level}`:""}`;
+  return (await apiFetch(q)) ?? null;
+}
+async function loadBackup() { return (await apiFetch("system/backup")) ?? null; }
+async function loadCosts()  { return (await apiFetch("system/costs"))  ?? null; }
+
+// ══════════════════════════════════════════════
+// CSV Export
+// ══════════════════════════════════════════════
+function exportCSV(filename, rows, columns){
+  if(!rows?.length){alert("لا توجد بيانات للتصدير");return;}
+  const header = columns.map(c=>`"${c.label.replace(/"/g,'""')}"`).join(",");
+  const body = rows.map(r=>columns.map(c=>{
+    let v = typeof c.get==="function" ? c.get(r) : r[c.key];
+    if(v==null) v="";
+    if(typeof v==="object") v=JSON.stringify(v);
+    v=String(v).replace(/"/g,'""');
+    return `"${v}"`;
+  }).join(",")).join("\n");
+  const csv = "\uFEFF"+header+"\n"+body;  // BOM for Excel UTF-8
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${filename}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════════════
+// TOKEN SHORTCUTS
+// ══════════════════════════════════════════════
+const T={
+  bg:"#06080e",surface:"#0d121b",card:"#141b27",border:"#1c2536",
+  gold:"#e0b04a",goldMid:"#c99835",goldDim:"#8a6a22",
+  green:"#3ecf8e",greenDim:"#134e37",red:"#ff6b6b",redDim:"#4a1d1d",
+  blue:"#5b9dff",blueDim:"#16325c",purple:"#b794f6",orange:"#f0a04b",
+  text:"#edf2f7",textMid:"#a8b3c4",muted:"#6b778c",dim:"#2a3344",
+};
+
+// Guard: لو Recharts مش محمّل، نعمل stub فارغ عشان الداشبورد ميكسرش
+const _R = (typeof Recharts !== 'undefined') ? Recharts : {};
+const CHARTS_OK = typeof Recharts !== 'undefined';
+const {
+  AreaChart,Area,LineChart,Line,BarChart,Bar,RadialBarChart,RadialBar,
+  XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Cell
+} = _R;
+const {useState,useEffect,useCallback,useRef,createElement:h} = React;
+
+// ── ErrorBoundary — يحمي Analytics من crash لو Recharts فشل ──
+class ChartErrorBoundary extends React.Component {
+  constructor(props){super(props);this.state={err:false};}
+  static getDerivedStateFromError(){return{err:true};}
+  render(){
+    if(this.state.err||!CHARTS_OK) return this.props.fallback||null;
+    return this.props.children;
+  }
+}
+
+// ── SafeChart — wrapper آمن حول أي مكون Recharts ──
+const SafeChart=({fallback,children})=>
+  h(ChartErrorBoundary,{fallback:fallback||h("div",{style:{color:T.muted,fontSize:12,padding:12}},"⚠️ تعذّر تحميل الرسم البياني")},children);
+
+// ══════════════════════════════════════════════
+// ATOMS
+// ══════════════════════════════════════════════
+const Card=({children,style={},className="",onClick})=>
+  h("div",{className:`ui-card ${onClick?"hcard":""} ${className}`,onClick,
+    style:{background:T.card,border:`1px solid ${T.border}`,borderRadius:14,padding:20,transition:"background .15s",...style}},children);
+
+const Tag=({children,color=T.gold,size=11})=>
+  h("span",{style:{background:color+"20",color,border:`1px solid ${color}40`,
+    padding:"2px 9px",borderRadius:20,fontSize:size,fontWeight:600,whiteSpace:"nowrap"}},children);
+
+const HR=()=>h("div",{style:{height:1,margin:"14px 0",background:`linear-gradient(90deg,transparent,${T.border},transparent)`}});
+
+const Dot=({color=T.green,size=8})=>
+  h("span",{className:"pulse",style:{display:"inline-block",width:size,height:size,borderRadius:"50%",background:color,marginLeft:5,flexShrink:0}});
+
+function Btn({children,onClick,variant="ghost",size="md",disabled=false}){
+  const cls={ghost:"btn btn-ghost",gold:"btn btn-gold",danger:"btn btn-danger",success:"btn btn-success",blue:"btn btn-blue"}[variant]||"btn btn-ghost";
+  const sizeCls={sm:"btn-sm",md:"btn-md",lg:"btn-lg"}[size]||"btn-md";
+  return h("button",{className:`${cls} ${sizeCls}`,onClick,disabled},children);
+}
+
+const SH=({icon,title,actions,sub})=>
+  h("div",{className:"section-head"},
+    h("div",{className:"section-title"},
+      h("span",{className:"ico"},icon),
+      h("div",null,
+        h("div",null,title),
+        sub&&h("div",{style:{fontSize:11,color:T.muted,fontWeight:400,marginTop:2}},sub)
+      )
+    ),
+    actions&&h("div",{style:{display:"flex",gap:8,flexWrap:"wrap"}},actions));
+const Empty=({icon="📭",title="لا توجد بيانات",hint})=>
+  h("div",{className:"empty-state"},
+    h("div",{className:"big"},icon),
+    h("h3",null,title),
+    hint&&h("p",null,hint));
+
+
+const CT=({active,payload,label})=>{
+  if(!active||!payload?.length) return null;
+  return h("div",{style:{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 14px",fontSize:12}},
+    h("div",{style:{color:T.muted,marginBottom:6,fontWeight:600}},label),
+    payload.map((p,i)=>h("div",{key:i,style:{display:"flex",alignItems:"center",gap:7,marginBottom:3}},
+      h("span",{style:{width:9,height:9,borderRadius:2,background:p.color,flexShrink:0}}),
+      h("span",{style:{color:T.muted,flex:1}},p.name),
+      h("span",{className:"mono",style:{color:p.color,fontWeight:700}},p.value?.toLocaleString())
+    ))
+  );
+};
+
+const Sk=({w="100%",h:ht=20,r=6})=>
+  h("div",{className:"shimmer",style:{width:w,height:ht,borderRadius:r}});
+
+function Toast({msg,type="ok",onDone}){
+  useEffect(()=>{const t=setTimeout(onDone,3400);return()=>clearTimeout(t);},[]);
+  const c=type==="ok"?T.green:type==="warn"?T.orange:T.red;
+  return h("div",{className:"toast fade-up",style:{border:`1px solid ${c}55`,color:c,
+    boxShadow:`0 12px 40px rgba(0,0,0,.4),0 0 0 1px ${c}15`}},
+    type==="ok"?"✅":type==="warn"?"⚠️":"❌"," ",msg);
+}
+
+function KPI({icon,label,value,sub,color=T.gold,trend}){
+  return h(Card,{className:"ui-kpi",style:{position:"relative",overflow:"hidden"}},
+    h("div",{style:{position:"absolute",top:0,right:0,width:3,height:"100%",
+      background:`linear-gradient(180deg,${color},transparent)`,borderRadius:"0 14px 14px 0"}}),
+    h("div",{style:{position:"absolute",top:-28,left:-16,width:88,height:88,borderRadius:"50%",
+      background:`radial-gradient(circle,${color}16,transparent 70%)`,pointerEvents:"none"}}),
+    h("div",{style:{display:"flex",gap:14,alignItems:"flex-start"}},
+      h("div",{style:{width:42,height:42,borderRadius:12,flexShrink:0,
+        background:`linear-gradient(145deg,${color}22,${color}08)`,border:`1px solid ${color}33`,
+        display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}},icon),
+      h("div",{style:{flex:1,minWidth:0}},
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:6,fontWeight:600}},label),
+        h("div",{className:"mono",style:{fontSize:25,fontWeight:700,color,lineHeight:1.1}},value??"—"),
+        sub&&h("div",{style:{fontSize:11,color:T.muted,marginTop:6}},sub),
+        trend!=null&&h("div",{style:{display:"inline-flex",alignItems:"center",gap:4,marginTop:8,
+          fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:999,
+          background:(trend>0?T.green:trend<0?T.red:T.muted)+"18",
+          color:trend>0?T.green:trend<0?T.red:T.muted}},
+          trend>0?"↑":trend<0?"↓":"→"," ",Math.abs(trend),"%")
+      )
+    )
+  );
+}
+
+// ══════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════
+
+function OverviewTab({ov,costs}){
+  if(!ov) return h("div",{className:"kpi-grid"},
+    Array(12).fill(0).map((_,i)=>h(Card,{key:i},h(Sk,{h:70}))));
+  // Defensive defaults — API fields vary; never crash the whole dashboard
+  const today = ov.today || {};
+  const total = ov.total || {};
+  const queue = ov.queue || {};
+  const premium = ov.premium || {};
+  const banned = ov.banned || {};
+  const system = ov.system || {memory:{}};
+  const mem = system.memory || {};
+  const n = (v)=> (typeof v==="number" && !isNaN(v)) ? v : (parseInt(v,10)||0);
+  const searches = n(today.searches);
+  const downloads = n(today.downloads);
+  const success = n(today.success ?? today.found);
+  const cacheHits = n(today.cacheHits ?? today.cache_hits);
+  const activeUsers = n(today.activeUsers ?? today.users);
+  const avgMs = n(today.avgMs);
+  const totalSearches = n(total.totalSearches ?? total.searches);
+  const totalDownloads = n(total.totalDownloads ?? total.downloads);
+  const sr = searches>0 ? ((success/searches)*100).toFixed(1) : "0";
+  const cacheRate = today.cacheRate || (searches>0 ? ((cacheHits/searches)*100).toFixed(1)+"%" : "0%");
+  const kpis=[
+    {icon:"🔍",label:"بحث اليوم",value:searches.toLocaleString(),color:T.blue,sub:`إجمالي: ${totalSearches.toLocaleString()}`},
+    {icon:"📥",label:"تحميل اليوم",value:downloads.toLocaleString(),color:T.gold,sub:`إجمالي: ${totalDownloads.toLocaleString()}`},
+    {icon:"✅",label:"نسبة النجاح",value:`${sr}٪`,color:+sr>=90?T.green:+sr>=70?T.orange:T.red,sub:`${success} نجاح`},
+    {icon:"⚡",label:"من الكاش",value:cacheHits.toLocaleString(),color:T.purple,sub:cacheRate},
+    {icon:"👥",label:"نشطون اليوم",value:activeUsers.toLocaleString(),color:T.blue},
+    {icon:"⏱️",label:"متوسط الاستجابة",value:avgMs?`${avgMs}ms`:"—",color:!avgMs?T.muted:avgMs<5000?T.green:T.red},
+    {icon:"⭐",label:"مميزون",value:n(premium.count),color:T.gold},
+    {icon:"🔄",label:"الطابور",value:n(queue.totalActiveJobs),color:T.orange,sub:`H:${n(queue.highQueue)} N:${n(queue.normalQueue)}`},
+    {icon:"💀",label:"DLQ",value:n(queue.dlqSize),color:n(queue.dlqSize)>10?T.red:T.muted},
+    {icon:"🚫",label:"محظورون",value:n(banned.count),color:T.red},
+    {icon:"💾",label:"Heap",value:`${n(mem.heapUsed)}MB`,color:T.muted,sub:`RSS:${n(mem.rss)}MB`},
+    {icon:"⏰",label:"Uptime",value:system.uptimeHuman||"—",color:T.green,sub:`${n(system.workers)} workers`},
+  ];
+  return h("div",{className:"fade-up"},
+    h("div",{className:"kpi-grid"},
+      kpis.map((k,i)=>h(KPI,{key:i,...k}))),
+    system.maintenance&&h("div",{style:{marginTop:16,background:T.redDim,border:`1px solid ${T.red}55`,
+      borderRadius:12,padding:"12px 18px",color:T.red,fontWeight:600,fontSize:13}},
+      "🔴 وضع الصيانة مفعّل — البوت لا يستقبل طلبات"),
+    // ── DASH 2.0: Costs widget ──
+    h("div",{style:{marginTop:16}},
+      h(CostsCard,{costs})
+    )
+  );
+}
+
+function AnalyticsTab({weekly,heatmap}){
+  if(!weekly?.length) return h(Card,null,h(Sk,{h:260}));
+  const data=weekly.map(d=>({...d,
+    "نجاح٪":d.searches>0?+((d.success/d.searches)*100).toFixed(1):0,
+    "كاش٪":d.searches>0?+((d.cacheHits/d.searches)*100).toFixed(1):0,
+  }));
+  return h("div",{className:"fade-up",style:{display:"flex",flexDirection:"column",gap:16}},
+    h(Card,null,
+      h(SH,{icon:"📈",title:"الحركة اليومية — آخر 7 أيام"}),
+      h(SafeChart,{fallback:h("div",{style:{color:T.muted,fontSize:12,padding:8}},"⚠️ تعذّر تحميل المخطط — تحقق من اتصال الإنترنت أو أعد تحميل الصفحة")},
+        h(ResponsiveContainer,{width:"100%",height:220},
+          h(AreaChart,{data,margin:{top:4,right:4,left:-24,bottom:0}},
+            h("defs",null,
+              ["gB","gG","gGr","gP"].map((id,i)=>
+                h("linearGradient",{key:id,id,x1:"0",y1:"0",x2:"0",y2:"1"},
+                  h("stop",{offset:"5%",stopColor:[T.blue,T.gold,T.green,T.purple][i],stopOpacity:.35}),
+                  h("stop",{offset:"95%",stopColor:[T.blue,T.gold,T.green,T.purple][i],stopOpacity:0})
+                )
+              )
+            ),
+            h(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),
+            h(XAxis,{dataKey:"date",tick:{fontSize:11,fill:T.muted},stroke:T.border}),
+            h(YAxis,{tick:{fontSize:10,fill:T.muted},stroke:T.border}),
+            h(Tooltip,{content:h(CT)}),
+            h(Area,{type:"monotone",dataKey:"searches",name:"بحث",stroke:T.blue,fill:"url(#gB)",strokeWidth:2}),
+            h(Area,{type:"monotone",dataKey:"downloads",name:"تحميل",stroke:T.gold,fill:"url(#gG)",strokeWidth:2}),
+            h(Area,{type:"monotone",dataKey:"success",name:"نجاح",stroke:T.green,fill:"url(#gGr)",strokeWidth:2}),
+            h(Area,{type:"monotone",dataKey:"cacheHits",name:"كاش",stroke:T.purple,fill:"url(#gP)",strokeWidth:2})
+          )
+        )
+      ),
+      h("div",{style:{display:"flex",gap:16,marginTop:8,flexWrap:"wrap"}},
+        [["بحث",T.blue],["تحميل",T.gold],["نجاح",T.green],["كاش",T.purple]].map(([k,c])=>
+          h("div",{key:k,style:{display:"flex",alignItems:"center",gap:5,fontSize:12}},
+            h("span",{style:{width:14,height:3,background:c,display:"inline-block",borderRadius:2}}),
+            h("span",{style:{color:T.muted}},k)
+          )
+        )
+      )
+    ),
+    h(Card,null,
+      h(SH,{icon:"📅",title:"جدول يومي تفصيلي"}),
+      h("div",{style:{overflowX:"auto"}},
+        h("table",null,
+          h("thead",null,h("tr",{style:{borderBottom:`2px solid ${T.border}`}},
+            ["التاريخ","بحث","تحميل","نجاح","فشل","كاش","نجاح٪","كاش٪","مستخدمون","⏱ms"].map(hd=>
+              h("th",{key:hd,style:{color:T.muted,fontWeight:500,fontSize:11,paddingBottom:10,whiteSpace:"nowrap"}},hd)
+            )
+          )),
+          h("tbody",null,weekly.map((d,i)=>{
+            const sr2=d.searches>0?((d.success/d.searches)*100).toFixed(1):"0";
+            const cr=d.searches>0?((d.cacheHits/d.searches)*100).toFixed(1):"0";
+            return h("tr",{key:i,style:{borderBottom:`1px solid ${T.border}20`}},
+              h("td",{className:"mono",style:{color:T.muted,fontSize:12}},d.date),
+              h("td",{className:"mono",style:{color:T.blue,fontWeight:600}},d.searches),
+              h("td",{className:"mono",style:{color:T.gold,fontWeight:600}},d.downloads),
+              h("td",{className:"mono",style:{color:T.green,fontWeight:600}},d.success),
+              h("td",{className:"mono",style:{color:d.fail>0?T.red:T.muted}},d.fail),
+              h("td",{className:"mono",style:{color:T.purple,fontWeight:600}},d.cacheHits),
+              h("td",null,h(Tag,{color:+sr2>=90?T.green:+sr2>=70?T.orange:T.red},`${sr2}٪`)),
+              h("td",null,h(Tag,{color:T.purple},`${cr}٪`)),
+              h("td",{className:"mono",style:{color:T.textMid}},d.activeUsers),
+              h("td",{className:"mono",style:{color:d.avgMs>6000?T.red:T.green,fontSize:11}},d.avgMs)
+            );
+          }))
+        )
+      ),
+      h("div",{style:{marginTop:10,display:"flex",justifyContent:"flex-end"}},
+        h(Btn,{variant:"ghost",onClick:()=>exportCSV("daily-stats",weekly,[
+          {key:"date",label:"التاريخ"},
+          {key:"searches",label:"بحث"},
+          {key:"downloads",label:"تحميل"},
+          {key:"success",label:"نجاح"},
+          {key:"fail",label:"فشل"},
+          {key:"cacheHits",label:"كاش"},
+          {key:"activeUsers",label:"مستخدمون"},
+          {key:"avgMs",label:"ms"},
+        ])},"📥 تصدير CSV")
+      )
+    ),
+    h(Heatmap,{data:heatmap})
+  );
+}
+
+function BooksTab({books}){
+  if(!books?.length) return h(Card,null,h(Sk,{h:300}));
+  const max=books[0]?.count||1;
+  const medals=["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
+  const barData=books.slice(0,8).map(b=>({name:b.title.slice(0,18),طلبات:b.count}));
+  return h("div",{className:"fade-up",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}},
+    h(Card,null,
+      h(SH,{icon:"🏆",title:"أكثر الكتب طلباً"}),
+      h("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+        books.slice(0,10).map((b,i)=>{
+          const pct=(b.count/max)*100;
+          const c=i===0?T.gold:i===1?"#c0c0c0":i===2?"#cd7f32":T.dim;
+          return h("div",{key:i},
+            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4,fontSize:13}},
+              h("span",null,medals[i]," ",h("span",{style:{fontWeight:i<3?600:400}},b.title.slice(0,32))),
+              h("span",{className:"mono",style:{color:c,fontWeight:700,fontSize:14}},b.count)
+            ),
+            h("div",{style:{background:T.dim,borderRadius:4,height:5,overflow:"hidden"}},
+              h("div",{style:{background:c,width:`${pct}%`,height:"100%",borderRadius:4,transition:"width .6s"}})
+            )
+          );
+        })
+      )
+    ),
+    h(Card,null,
+      h(SH,{icon:"📊",title:"توزيع الطلبات"}),
+      h(SafeChart,null,
+        h(ResponsiveContainer,{width:"100%",height:320},
+          h(BarChart,{data:barData,layout:"vertical",margin:{top:0,right:30,left:0,bottom:0}},
+            h(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border,horizontal:false}),
+            h(XAxis,{type:"number",tick:{fontSize:10,fill:T.muted},stroke:T.border}),
+            h(YAxis,{dataKey:"name",type:"category",tick:{fontSize:10,fill:T.textMid},stroke:T.border,width:80}),
+            h(Tooltip,{content:h(CT)}),
+            h(Bar,{dataKey:"طلبات",radius:[0,6,6,0]},
+              barData.map((_,i)=>h(Cell,{key:i,fill:i===0?T.gold:i===1?T.goldMid:i===2?"#b87333":T.dim}))
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function SourcesTab({sources}){
+  if(!sources?.length) return h(Card,null,h(Sk,{h:200}));
+  // DASH 2.0 — derive a tiny synthetic sparkline if the API didn't give one.
+  // Shows last 7d trend if `s.history` is provided as [{ok,fail}], else flat bar.
+  const trendOf = (s) => {
+    if(Array.isArray(s.history)&&s.history.length){
+      return s.history.map(h2=>{ const t=(h2.ok||0)+(h2.fail||0); return t>0?(h2.ok/t)*100:0; });
+    }
+    return null;
+  };
+  // Sort: best success rate at top
+  const sorted = [...sources].sort((a,b)=>{
+    const ra = (a.ok+a.fail)>0 ? a.ok/(a.ok+a.fail) : 0;
+    const rb = (b.ok+b.fail)>0 ? b.ok/(b.ok+b.fail) : 0;
+    return rb-ra;
+  });
+  return h("div",{className:"fade-up"},
+    h(Card,null,
+      h(SH,{icon:"🔌",title:`صحة المصادر — ${sources.length} مصدر`,actions:
+        h("span",{style:{fontSize:11,color:T.muted}},"مرتّبة حسب النسبة")
+      }),
+      h("table",null,
+        h("thead",null,h("tr",{style:{borderBottom:`2px solid ${T.border}`}},
+          ["المصدر","✅ نجاح","❌ فشل","النسبة","الشريط","الاتجاه","الحالة"].map(hd=>
+            h("th",{key:hd,style:{color:T.muted,fontWeight:500,fontSize:11,paddingBottom:10}},hd)
+          )
+        )),
+        h("tbody",null,sorted.map((s,i)=>{
+          const t=s.ok+s.fail, r=t>0?(s.ok/t)*100:0, c=r>=90?T.green:r>=75?T.orange:T.red;
+          const trend = trendOf(s);
+          return h("tr",{key:i,style:{borderBottom:`1px solid ${T.border}20`}},
+            h("td",{style:{fontWeight:600,maxWidth:280,overflow:"hidden",textOverflow:"ellipsis"}},s.domain),
+            h("td",null,h("span",{className:"mono",style:{color:T.green,fontWeight:700}},s.ok)),
+            h("td",null,h("span",{className:"mono",style:{color:s.fail>0?T.red:T.muted}},s.fail)),
+            h("td",null,h(Tag,{color:c},s.rate)),
+            h("td",{style:{width:100}},
+              h("div",{style:{background:T.dim,borderRadius:4,height:6,overflow:"hidden"}},
+                h("div",{style:{background:c,width:`${r}%`,height:"100%",borderRadius:4}})
+              )
+            ),
+            h("td",{style:{width:80}}, trend ? h(SourceSparkline,{values:trend,color:c,w:64,h:22}) : h("span",{style:{color:T.muted,fontSize:10}},"—")),
+            h("td",{style:{fontSize:12}},r>=90?"🟢 ممتاز":r>=75?"🟡 جيد":"🔴 ضعيف")
+          );
+        }))
+      )
+    )
+  );
+}
+
+function QueueTab({queue,dlq,onToast,onRefresh}){
+  const [show,setShow]=useState(false);
+  if(!queue) return h("div",{style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}},
+    Array(4).fill(0).map((_,i)=>h(Card,{key:i},h(Sk,{h:80}))));
+  const clearDLQ=async()=>{if(!confirm("مسح DLQ؟"))return;await apiAct("DELETE","queue/dlq");onToast("تم مسح DLQ ✅");onRefresh();};
+  const clearAll=async()=>{if(!confirm("⚠️ مسح الطوابير كلها؟"))return;await apiAct("DELETE","queue/all");onToast("تم المسح ✅","warn");onRefresh();};
+  return h("div",{className:"fade-up",style:{display:"flex",flexDirection:"column",gap:16}},
+    h("div",{style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}},
+      [["⚡ High",queue.highQueue,T.green],["📋 Normal",queue.normalQueue,T.blue],
+       ["💀 DLQ",queue.dlqSize,queue.dlqSize>10?T.red:T.muted],["⚙️ Active",queue.totalActiveJobs,T.orange]]
+      .map(([l,v,c])=>h(Card,{key:l,style:{textAlign:"center"}},
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:8}},l),
+        h("div",{className:"mono",style:{fontSize:40,fontWeight:800,color:c,lineHeight:1}},v)
+      ))
+    ),
+    h(Card,null,
+      h(SH,{icon:"💀",title:`قائمة DLQ — ${dlq?.length||0} مهمة`,
+        actions:h("div",{style:{display:"flex",gap:8}},
+          h(Btn,{variant:"danger",size:"sm",onClick:clearDLQ},"🗑️ مسح DLQ"),
+          h(Btn,{variant:"danger",size:"sm",onClick:clearAll},"⚠️ مسح الكل"),
+          dlq?.length>0&&h(Btn,{variant:"ghost",size:"sm",onClick:()=>setShow(p=>!p)},show?"▲":"▼")
+        )}),
+      !dlq?.length&&h("div",{style:{color:T.green,fontSize:13,display:"flex",alignItems:"center",gap:6}},
+        h(Dot),"لا مهام فاشلة"),
+      show&&dlq?.length>0&&h("div",{style:{maxHeight:300,overflowY:"auto",marginTop:8,display:"flex",flexDirection:"column",gap:6}},
+        dlq.map((j,i)=>h("div",{key:i,style:{padding:"10px 12px",background:T.surface,borderRadius:8,
+          border:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",gap:12}},
+          h("div",null,
+            h("div",{style:{fontWeight:600,marginBottom:3}},"📗 ",j.bookName),
+            h("div",{style:{color:T.red,fontSize:11}},"❌ ",j.failReason)
+          ),
+          h("div",{style:{textAlign:"left",fontSize:11,color:T.muted,flexShrink:0}},
+            h("div",{className:"mono"},j.userId),
+            h("div",null,new Date(j.createdAt).toLocaleTimeString("ar"))
+          )
+        ))
+      )
+    )
+  );
+}
+
+function UsersTab({prem,banned,allUsers,onToast,onRefresh,onUserClick}){
+  const [tab,setTab]=useState("manage");
+  const [uid,setUid]=useState("");
+  const [lim,setLim]=useState("");
+  const [days,setDays]=useState("");   // مدة التميز بالأيام (فارغ = manual بدون انتهاء)
+  const [search,setSearch]=useState("");
+  const SubBtn=({id,label})=>h("button",{onClick:()=>setTab(id),style:{
+    background:tab===id?T.goldDim+"40":"transparent",border:`1px solid ${tab===id?T.gold:T.border}`,
+    color:tab===id?T.gold:T.muted,padding:"6px 16px",borderRadius:8,fontSize:12,fontWeight:tab===id?600:400}},label);
+  const act=async(type,id2=uid)=>{
+    if(!id2.trim()){onToast("أدخل User ID أولاً","err");return;}
+    const grantBody = days && +days>0 ? {enable:true,days:+days} : {enable:true};
+    const m={
+      grantPrem:()=>apiAct("POST",`users/${id2}/premium`,grantBody),
+      revokePrem:()=>apiAct("POST",`users/${id2}/premium`,{enable:false}),
+      ban:()=>apiAct("POST",`users/${id2}/ban`),
+      unban:()=>apiAct("DELETE",`users/${id2}/ban`),
+      setLim:()=>apiAct("PUT",`users/${id2}/limit`,{limit:+lim}),
+      resetLim:()=>apiAct("DELETE",`users/${id2}/limit`),
+    };
+    await m[type]?.();
+    const grantMsg = days && +days>0 ? `⭐ تميز ${days} يوم` : "⭐ تميز دائم (manual)";
+    const msgs={grantPrem:grantMsg,revokePrem:"✅ إلغاء تميز",ban:"🚫 تم الحظر",unban:"✅ رفع الحظر",setLim:`✅ حد: ${lim}`,resetLim:"✅ إعادة"};
+    onToast(msgs[type]);onRefresh();
+  };
+  // فلتر بحث المستخدمين
+  const filteredUsers=(allUsers?.users||[]).filter(u=>{
+    if(!search.trim())return true;
+    const q=search.toLowerCase();
+    return (u.telegramId||"").includes(q)||(u.firstName||"").toLowerCase().includes(q)||(u.username||"").toLowerCase().includes(q);
+  });
+  return h("div",{className:"fade-up"},
+    h(Card,null,
+      h("div",{style:{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap"}},
+        h(SubBtn,{id:"manage",label:"⚙️ إدارة يدوية"}),
+        h(SubBtn,{id:"all",label:`👥 كل المستخدمين (${allUsers?.total??"-"})`}),
+        h(SubBtn,{id:"premium",label:`⭐ مميزون (${prem?.length||0})`}),
+        h(SubBtn,{id:"banned",label:`🚫 محظورون (${banned?.length||0})`})
+      ),
+      tab==="manage"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        h("div",null,
+          h("div",{style:{fontSize:11,color:T.muted,marginBottom:6}},"Telegram User ID"),
+          h("input",{value:uid,onChange:e=>setUid(e.target.value),placeholder:"مثال: 112233445",style:{direction:"ltr",maxWidth:280}})
+        ),
+        h("div",null,
+          h("div",{style:{fontSize:11,color:T.muted,marginBottom:6}},"مدة التميز (أيام) — اتركه فارغاً للمنحة الإدارية الدائمة"),
+          h("div",{style:{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}},
+            h("input",{value:days,onChange:e=>setDays(e.target.value),type:"number",min:"0",
+              placeholder:"مثلاً 30",style:{direction:"ltr",maxWidth:140}}),
+            [7,30,90,365].map(n=>h("button",{key:n,onClick:()=>setDays(String(n)),style:{
+              background:days===String(n)?T.goldDim+"40":"transparent",
+              border:`1px solid ${days===String(n)?T.gold:T.border}`,
+              color:days===String(n)?T.gold:T.muted,
+              padding:"5px 10px",borderRadius:6,fontSize:11}},`${n}ي`)),
+            h("button",{onClick:()=>setDays(""),style:{
+              background:days===""?T.goldDim+"40":"transparent",
+              border:`1px solid ${days===""?T.gold:T.border}`,
+              color:days===""?T.gold:T.muted,
+              padding:"5px 10px",borderRadius:6,fontSize:11}},"دائم")
+          )
+        ),
+        h("div",{style:{display:"flex",gap:8,flexWrap:"wrap"}},
+          h(Btn,{variant:"gold",onClick:()=>act("grantPrem")},"⭐ منح تميز"),
+          h(Btn,{variant:"ghost",onClick:()=>act("revokePrem")},"❌ إلغاء تميز"),
+          h(Btn,{variant:"danger",onClick:()=>act("ban")},"🚫 حظر"),
+          h(Btn,{variant:"success",onClick:()=>act("unban")},"✅ رفع حظر")
+        ),
+        h(HR),
+        h("div",{style:{fontSize:12,color:T.muted,marginBottom:4}},"الحد اليومي"),
+        h("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+          h("input",{value:lim,onChange:e=>setLim(e.target.value),placeholder:"عدد الكتب (0=بلا حد)",style:{direction:"ltr",maxWidth:220}}),
+          h(Btn,{variant:"gold",onClick:()=>act("setLim")},"💾 حفظ"),
+          h(Btn,{variant:"ghost",onClick:()=>act("resetLim")},"♻️ إعادة")
+        )
+      ),
+      tab==="all"&&h("div",null,
+        // شريط بحث
+        h("div",{style:{marginBottom:14}},
+          h("input",{value:search,onChange:e=>setSearch(e.target.value),
+            placeholder:"🔍 ابحث باسم أو username أو ID...",
+            style:{width:"100%",maxWidth:380,direction:"rtl"}})
+        ),
+        !allUsers&&h(Sk,{h:200}),
+        allUsers&&h("div",null,
+          h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:8}},
+            h("div",{style:{fontSize:11,color:T.muted}},
+              `إجمالي: ${allUsers.total} مستخدم — يُعرض: ${filteredUsers.length}`
+            ),
+            h(Btn,{variant:"ghost",onClick:()=>exportCSV("users",allUsers.users||[],[
+              {key:"firstName",label:"الاسم"},
+              {key:"username",label:"Username"},
+              {key:"telegramId",label:"Telegram ID"},
+              {key:"totalSearches",label:"عدد البحث"},
+              {key:"totalDownloads",label:"عدد التحميل"},
+              {key:"createdAt",label:"تاريخ الانضمام"},
+            ])},"📥 تصدير CSV")
+          ),
+          h("div",{style:{fontSize:10,color:T.muted,marginBottom:8,opacity:.7}},"💡 اضغط على أي مستخدم لرؤية تفاصيله"),
+          h("div",{style:{overflowX:"auto"}},
+            h("table",null,
+              h("thead",null,h("tr",{style:{borderBottom:`2px solid ${T.border}`}},
+                ["الاسم","Username","Telegram ID","بحث","تحميل","تاريخ الانضمام"].map(hd=>
+                  h("th",{key:hd,style:{color:T.muted,fontWeight:500,fontSize:11,paddingBottom:10,whiteSpace:"nowrap",textAlign:"right"}},hd)
+                )
+              )),
+              h("tbody",null,filteredUsers.map((u,i)=>
+                h("tr",{key:i,onClick:()=>onUserClick&&onUserClick(u.telegramId),style:{borderBottom:`1px solid ${T.border}20`,cursor:"pointer",transition:"background 0.15s"},
+                  onMouseEnter:e=>e.currentTarget.style.background=T.card,
+                  onMouseLeave:e=>e.currentTarget.style.background="transparent"},
+                  h("td",{style:{fontWeight:500,fontSize:13}},u.firstName||h("span",{style:{color:T.dim}},"—")),
+                  h("td",{style:{color:T.muted,fontSize:12}},u.username?`@${u.username}`:h("span",{style:{color:T.dim}},"—")),
+                  h("td",{className:"mono",style:{color:T.textMid,fontSize:11}},u.telegramId),
+                  h("td",{className:"mono",style:{color:T.blue,fontWeight:600}},u.totalSearches||0),
+                  h("td",{className:"mono",style:{color:T.gold,fontWeight:600}},u.totalDownloads||0),
+                  h("td",{className:"mono",style:{color:T.muted,fontSize:11}},
+                    u.createdAt?new Date(u.createdAt).toLocaleDateString("ar-EG"):"-"
+                  )
+                )
+              ))
+            )
+          )
+        )
+      ),
+      tab==="premium"&&h("div",{style:{maxHeight:360,overflowY:"auto",display:"flex",flexDirection:"column",gap:6}},
+        !(prem?.length)&&h("div",{style:{color:T.muted}},"لا يوجد مميزون"),
+        (prem||[]).map((id,i)=>h("div",{key:i,style:{display:"flex",justifyContent:"space-between",alignItems:"center",
+          padding:"10px 12px",background:T.surface,borderRadius:8,border:`1px solid ${T.border}`}},
+          h("span",null,"⭐ ",h("span",{className:"mono",style:{color:T.gold}},id)),
+          h(Btn,{variant:"danger",size:"sm",onClick:()=>act("revokePrem",id)},"إلغاء التميز")
+        ))
+      ),
+      tab==="banned"&&h("div",{style:{maxHeight:360,overflowY:"auto",display:"flex",flexDirection:"column",gap:6}},
+        !(banned?.length)&&h("div",{style:{color:T.muted}},"لا يوجد محظورون"),
+        (banned||[]).map((id,i)=>h("div",{key:i,style:{display:"flex",justifyContent:"space-between",alignItems:"center",
+          padding:"10px 12px",background:T.surface,borderRadius:8,border:`1px solid ${T.border}`}},
+          h("span",null,"🚫 ",h("span",{className:"mono",style:{color:T.red}},id)),
+          h(Btn,{variant:"success",size:"sm",onClick:()=>act("unban",id)},"رفع الحظر")
+        ))
+      )
+    )
+  );
+}
+
+function BroadcastBox({onToast}){
+  const [msg,setMsg]=useState("");
+  const [target,setTarget]=useState("all");   // all | premium | active7
+  const [busy,setBusy]=useState(false);
+  const [stats,setStats]=useState(null);
+  const send=async()=>{
+    const text=msg.trim();
+    if(text.length<3){onToast("الرسالة قصيرة","err");return;}
+    if(text.length>4000){onToast("الرسالة طويلة جداً (4000 حرف)","err");return;}
+    if(!confirm(`إرسال الرسالة إلى ${target==="all"?"كل المستخدمين":target==="premium"?"المميزين فقط":"المستخدمين النشطين 7 أيام"}؟`))return;
+    setBusy(true); setStats(null);
+    try{
+      const r=await fetch(`${API_BASE}/api/admin/broadcast`,{
+        method:"POST",
+        headers:{Authorization:`Bearer ${getToken()}`,"Content-Type":"application/json"},
+        body:JSON.stringify({message:text,target})
+      });
+      const j=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(j.error||`HTTP ${r.status}`);
+      const d=j.data??j;
+      setStats(d);
+      onToast(`📢 بدأ الإرسال إلى ${d.total||0} مستخدم`);
+      setMsg("");
+    }catch(e){onToast(`❌ ${e.message||e}`,"err");}
+    finally{setBusy(false);}
+  };
+  const TargetBtn=({id,label})=>h("button",{onClick:()=>setTarget(id),style:{
+    background:target===id?T.goldDim+"40":"transparent",
+    border:`1px solid ${target===id?T.gold:T.border}`,
+    color:target===id?T.gold:T.muted,
+    padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:target===id?600:400}},label);
+  return h(Card,null,
+    h(SH,{icon:"📢",title:"إعلان عام للمستخدمين"}),
+    h("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+      h("div",null,
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:6}},"الفئة المستهدفة"),
+        h("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+          h(TargetBtn,{id:"all",label:"👥 الكل"}),
+          h(TargetBtn,{id:"premium",label:"⭐ المميزون"}),
+          h(TargetBtn,{id:"active7",label:"🕐 النشطون (7ي)"})
+        )
+      ),
+      h("textarea",{value:msg,onChange:e=>setMsg(e.target.value),
+        placeholder:"اكتب الإعلان هنا… (يدعم HTML بسيط: <b>عريض</b> <i>مائل</i> <a href=\"...\">رابط</a>)",
+        rows:5,maxLength:4000,
+        style:{direction:"rtl",resize:"vertical",minHeight:120,fontSize:13,lineHeight:1.6}}),
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:11,color:T.muted}},
+        h("span",null,`${msg.length}/4000 حرف`),
+        h("span",null,"⚠️ الإرسال يحترم الـ rate-limit وقد يستغرق دقائق")
+      ),
+      h("div",{style:{display:"flex",gap:8}},
+        h(Btn,{variant:"gold",onClick:send,disabled:busy},busy?"… جاري الإرسال":"📤 إرسال الآن"),
+        h(Btn,{variant:"ghost",onClick:()=>{setMsg("");setStats(null);}},"🔄 إعادة")
+      ),
+      stats&&h("div",{style:{marginTop:8,padding:"10px 14px",background:T.greenDim+"30",
+        border:`1px solid ${T.green}`,borderRadius:8,fontSize:12,color:T.green,lineHeight:1.7}},
+        `✅ تم وضع الإعلان في طابور الإرسال`,
+        h("br"),
+        `الفئة: ${stats.target==="all"?"الكل":stats.target==="premium"?"المميزون":"النشطون"} — إجمالي مقدّر: ${stats.total||0} مستخدم`,
+        h("br"),
+        h("span",{style:{fontSize:11,color:T.muted}},"تابع تقدّم الإرسال من الـ logs على السيرفر"))
+    )
+  );
+}
+
+function SystemTab({system,backup,maintenance,onToggleMaint,onClearBL,onToast}){
+  if(!system) return h(Card,null,h(Sk,{h:300}));
+  return h("div",{className:"fade-up",style:{display:"flex",flexDirection:"column",gap:16}},
+    maintenance&&h("div",{style:{background:T.redDim,border:`1px solid ${T.red}55`,
+      borderRadius:12,padding:"12px 18px",color:T.red,fontWeight:600,fontSize:13}},"🔴 وضع الصيانة مفعّل"),
+    h("div",{style:{display:"flex",gap:10,flexWrap:"wrap"}},
+      h(Btn,{variant:maintenance?"success":"danger",onClick:onToggleMaint},maintenance?"✅ إيقاف الصيانة":"🔧 تفعيل الصيانة"),
+      h(Btn,{variant:"ghost",onClick:onClearBL},"🧹 مسح Blacklist")
+    ),
+    h(BroadcastBox,{onToast}),
+    // ── DASH 2.0: Backup status ──
+    h(BackupCard,{backup}),
+    h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:8}},
+      [["Node.js",system.nodeVersion,T.green],["PID",system.pid,T.muted],
+       ["Heap Used",`${system.memory.heapUsed} MB`,T.blue],["Heap Total",`${system.memory.heapTotal} MB`,T.muted],
+       ["RSS",`${system.memory.rss} MB`,T.muted],["Workers",system.workers,T.gold],
+       ["Redis",system.redis?"🟢 متصل":"🔴 منقطع",system.redis?T.green:T.red],
+       ["Uptime",system.uptimeHuman,T.green]]
+      .map(([l,v,c])=>h("div",{key:l,style:{display:"flex",justifyContent:"space-between",alignItems:"center",
+        padding:"10px 14px",background:T.surface,borderRadius:8,border:`1px solid ${T.border}`}},
+        h("span",{style:{color:T.muted,fontSize:12}},l),
+        h("span",{className:"mono",style:{color:c,fontWeight:700,fontSize:13}},v)
+      ))
+    )
+  );
+}
+
+// ══════════════════════════════════════════════
+// APP ROOT
+// ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+// TelemetryTab
+// ══════════════════════════════════════════════
+function Metric({label,value,sub,color}){
+  return h("div",{style:{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px 20px",textAlign:"center",minWidth:130}},
+    h("div",{style:{fontSize:22,fontWeight:800,color:color||T.gold}},value),
+    h("div",{style:{fontSize:12,color:T.text,marginTop:4}},label),
+    sub&&h("div",{style:{fontSize:10,color:T.muted,marginTop:2}},sub)
+  );
+}
+
+function FunnelBar({label,value,max,color}){
+  const pct=max>0?Math.round((value/max)*100):0;
+  return h("div",{style:{marginBottom:10}},
+    h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:4}},
+      h("span",{style:{fontSize:12,color:T.text}},label),
+      h("span",{style:{fontSize:12,fontWeight:700,color:color||T.gold}},`${value.toLocaleString()} (${pct}%)`)
+    ),
+    h("div",{style:{height:8,background:T.border,borderRadius:4,overflow:"hidden"}},
+      h("div",{style:{height:"100%",width:`${pct}%`,background:color||T.gold,borderRadius:4,transition:"width .4s"}})
+    )
+  );
+}
+
+function OutcomeBadge({outcome}){
+  const cfg={
+    sent_direct:  {bg:"#22c55e22",color:"#22c55e",label:"✅ أُرسل مباشر"},
+    sent_local:   {bg:"#3b82f622",color:"#3b82f6",label:"📥 حُمّل محلياً"},
+    sent_from_cache:{bg:"#a78bfa22",color:"#a78bfa",label:"⚡ من الكاش"},
+    links_only:   {bg:"#f59e0b22",color:"#f59e0b",label:"🔗 روابط فقط"},
+    no_results:   {bg:"#ef444422",color:"#ef4444",label:"❌ لا نتائج"},
+    error:        {bg:"#ef444422",color:"#ef4444",label:"💥 خطأ"},
+  }[outcome]||{bg:T.border,color:T.muted,label:outcome};
+  return h("span",{style:{
+    padding:"2px 8px",borderRadius:12,fontSize:11,fontWeight:600,
+    background:cfg.bg,color:cfg.color,whiteSpace:"nowrap"
+  }},cfg.label);
+}
+
+function PhaseLine({phase,i}){
+  const icons={"request_started":"🚀","search_done":"🔍","verify_done":"🔎",
+    "download_started":"📥","download_done":"✅","request_done":"🏁"};
+  const icon=icons[phase.name]||"•";
+  const dataStr=phase.data?Object.entries(phase.data)
+    .filter(([k])=>k!=="ms")
+    .map(([k,v])=>`${k}: ${JSON.stringify(v)}`).join("  "):"";
+  const ms=phase.data?.ms!=null?` +${phase.data.ms}ms`:"";
+  return h("div",{style:{
+    display:"flex",alignItems:"flex-start",gap:10,padding:"6px 0",
+    borderBottom:i>0?`1px solid ${T.border}22`:"none",
+  }},
+    h("span",{style:{width:24,flexShrink:0,textAlign:"center"}},icon),
+    h("div",{style:{flex:1,minWidth:0}},
+      h("span",{style:{fontSize:12,fontWeight:600,color:T.text}},phase.name),
+      ms&&h("span",{style:{fontSize:10,color:T.muted,marginRight:6}},ms),
+      dataStr&&h("div",{style:{fontSize:10,color:T.muted,marginTop:2,wordBreak:"break-word"}},dataStr)
+    )
+  );
+}
+
+function TraceModal({trace,onClose}){
+  if(!trace)return null;
+  return h("div",{onClick:onClose,style:{
+    position:"fixed",inset:0,background:"rgba(0,0,0,.7)",zIndex:9999,
+    display:"flex",alignItems:"center",justifyContent:"center",padding:20
+  }},
+    h("div",{onClick:e=>e.stopPropagation(),style:{
+      background:T.surface,border:`1px solid ${T.border}`,borderRadius:14,
+      padding:24,maxWidth:560,width:"100%",maxHeight:"85vh",overflowY:"auto",
+      boxShadow:"0 20px 60px rgba(0,0,0,.5)"
+    }},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
+        h("div",null,
+          h("div",{style:{fontWeight:700,fontSize:14,color:T.gold}},
+            trace.bookName.slice(0,60)),
+          h("div",{style:{fontSize:11,color:T.muted,marginTop:2}},
+            `ID: ${trace.id.slice(0,16)}… | user: ${trace.userId}${trace.retryNo>0?" | retry #"+trace.retryNo:""}`),
+        ),
+        h("button",{onClick:onClose,style:{background:"transparent",border:"none",color:T.muted,cursor:"pointer",fontSize:20}},"×")
+      ),
+      h("div",{style:{marginBottom:16,display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}},
+        h(OutcomeBadge,{outcome:trace.outcome||"unknown"}),
+        trace.totalMs&&h("span",{style:{fontSize:11,color:T.muted}},`⏱ ${trace.totalMs}ms`)
+      ),
+      trace.phases?.length
+        ? h("div",null,
+            // الـ waterfall أوّلاً (visual)، بعدها التفاصيل النصية المتدرّجة
+            h(TraceWaterfall,{trace}),
+            h(HR),
+            h("div",{style:{fontSize:11,color:T.muted,marginBottom:6,fontWeight:600}},"📋 التفاصيل المرحلية"),
+            trace.phases.map((p,i)=>h(PhaseLine,{key:i,phase:p,i}))
+          )
+        : h("div",{style:{color:T.muted,fontSize:12,padding:"12px 0",textAlign:"center"}},
+            "⏳ تفاصيل المراحل لم تعد متاحة (انتهت TTL 6h) — metadata الأساسية موجودة")
+    )
+  );
+}
+
+function TelemetryTab({funnel,traces}){
+  const [selected,setSelected]=useState(null);
+  const f=funnel||{};
+
+  const totalReqs=(f._searchFound||0)+(f._searchMiss||0);
+
+  return h("div",{style:{padding:"0 4px"}},
+    // ── Funnel Metrics ──────────────────────────
+    h("div",{style:{marginBottom:24}},
+      h("h3",{style:{color:T.gold,marginBottom:14,fontSize:14,fontWeight:700}},"📊 Funnel اليوم"),
+      !totalReqs&&h("div",{style:{color:T.muted,fontSize:13,padding:"20px 0",textAlign:"center"}},"لا بيانات بعد — ستظهر بعد أول طلبات"),
+      totalReqs>0&&h("div",{style:{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}},
+        h(Metric,{label:"إجمالي الطلبات",value:totalReqs}),
+        h(Metric,{label:"نجاح البحث",value:`${f.searchFoundRate??0}%`,color:"#22c55e",sub:`${f._searchFound} طلب`}),
+        h(Metric,{label:"نجاح Verify",value:`${f.verifyPassRate??0}%`,color:"#3b82f6",sub:`${f._verifyValid}/${f._verifyChecked}`}),
+        h(Metric,{label:"نجاح الإرسال",value:`${f.sendSuccessRate??0}%`,color:"#a78bfa",sub:`${f._sendSuccess} طلب`}),
+      ),
+      totalReqs>0&&h("div",{style:{background:T.surface2||T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"16px 20px"}},
+        h("div",{style:{fontSize:12,color:T.muted,marginBottom:12,fontWeight:600}},"مسار الطلب — كل شريط من إجمالي الطلبات"),
+        h(FunnelBar,{label:"🔍 البحث أعطى نتائج",value:f._searchFound||0,max:totalReqs,color:"#22c55e"}),
+        h(FunnelBar,{label:"🔎 URLs اجتازت Verify",value:f._verifyValid||0,max:totalReqs,color:"#3b82f6"}),
+        h(FunnelBar,{label:"✅ أُرسل ملف",value:f._sendSuccess||0,max:totalReqs,color:"#a78bfa"}),
+        h("div",{style:{marginTop:16,paddingTop:12,borderTop:`1px solid ${T.border}`,display:"flex",gap:20,flexWrap:"wrap"}}),
+        h("div",{style:{fontSize:11,color:T.muted}},
+          `📤 إرسال مباشر: ${f._sendDirect||0}   📥 تحميل محلي: ${f._sendLocal||0}`)
+      )
+    ),
+
+    // ── Traces ───────────────────────────────────
+    h("div",null,
+      h("h3",{style:{color:T.gold,marginBottom:14,fontSize:14,fontWeight:700}},
+        "🔍 آخر الطلبات (Traces) ",
+        h("span",{style:{fontSize:11,color:T.muted,fontWeight:400}},"اضغط لعرض التفاصيل")),
+      !traces?.length&&h("div",{style:{color:T.muted,fontSize:13,padding:"20px 0",textAlign:"center"}},"لا traces بعد"),
+      h("div",{style:{display:"flex",flexDirection:"column",gap:6}},
+        (traces||[]).map(t=>h("div",{key:t.id,
+          onClick:()=>setSelected(t),
+          style:{
+            background:T.surface,border:`1px solid ${T.border}`,borderRadius:8,
+            padding:"10px 14px",cursor:"pointer",display:"flex",
+            justifyContent:"space-between",alignItems:"center",gap:12,
+            transition:"border-color .15s",
+          },
+          onMouseEnter:e=>e.currentTarget.style.borderColor=T.gold+"88",
+          onMouseLeave:e=>e.currentTarget.style.borderColor=T.border,
+        },
+          h("div",{style:{flex:1,minWidth:0}},
+            h("div",{style:{fontSize:13,fontWeight:600,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},
+              t.bookName.slice(0,50)),
+            h("div",{style:{fontSize:10,color:T.muted,marginTop:2}},
+              `user ${t.userId} • ${new Date(t.startedAt).toLocaleTimeString("ar-EG")}${t.retryNo>0?" • retry #"+t.retryNo:""}`),
+          ),
+          h("div",{style:{display:"flex",alignItems:"center",gap:8,flexShrink:0}},
+            h(OutcomeBadge,{outcome:t.outcome||"unknown"}),
+            t.totalMs&&h("span",{style:{fontSize:10,color:T.muted}},`${(t.totalMs/1000).toFixed(1)}s`)
+          )
+        ))
+      )
+    ),
+
+    // Modal
+    selected&&h(TraceModal,{trace:selected,onClose:()=>setSelected(null)})
+  );
+}
+
+const TABS=[
+  {id:"overview",icon:"🏠",label:"نظرة عامة",group:"رئيسي"},
+  {id:"analytics",icon:"📊",label:"التحليلات",group:"رئيسي"},
+  {id:"books",icon:"📚",label:"الكتب",group:"محتوى"},
+  {id:"failed",icon:"❌",label:"فشل البحث",group:"محتوى"},
+  {id:"cache",icon:"💾",label:"مكتبة الكاش",group:"محتوى"},
+  {id:"recent",icon:"🕐",label:"آخر الطلبات",group:"محتوى"},
+  {id:"sources",icon:"🔌",label:"المصادر",group:"تشغيل"},
+  {id:"queue",icon:"🔄",label:"الطابور",group:"تشغيل"},
+  {id:"users",icon:"👥",label:"المستخدمون",group:"تشغيل"},
+  {id:"telemetry",icon:"📡",label:"القياس",group:"مراقبة"},
+  {id:"logs",icon:"📜",label:"السجلات",group:"مراقبة"},
+  {id:"system",icon:"💻",label:"النظام",group:"مراقبة"},
+];
+const TAB_GROUPS=["رئيسي","محتوى","تشغيل","مراقبة"];
+
+
+// ── Cached Books Tab ──────────────────────────────────────────
+function CacheTab({books}){
+  const [search,setSearch]=useState("");
+  if(!books) return h(Card,null,h(Sk,{h:300}));
+  const filtered=books.filter(b=>!search.trim()||
+    (b.bookName||b.bookQuery||"").toLowerCase().includes(search.toLowerCase()));
+  const totalServed=books.reduce((s,b)=>s+(b.timesServed||0),0);
+  return h("div",{className:"fade-up"},
+    h(Card,null,
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:8}},
+        h(SH,{icon:"💾",title:`مكتبة الكاش — ${books.length} كتاب · ${totalServed} مرة استخدام`}),
+        h(Btn,{variant:"ghost",onClick:()=>exportCSV("cached-books",books,[
+          {key:"bookName",label:"اسم الكتاب"},
+          {key:"bookQuery",label:"الاستعلام"},
+          {key:"sourceUrl",label:"المصدر"},
+          {key:"timesServed",label:"مرات الاستخدام"},
+          {key:"createdAt",label:"تاريخ الإضافة"},
+        ])},"📥 تصدير CSV")
+      ),
+      h("div",{style:{marginBottom:12}},
+        h("input",{value:search,onChange:e=>setSearch(e.target.value),
+          placeholder:"🔍 ابحث في الكاش...",style:{width:"100%",maxWidth:380,direction:"rtl"}})
+      ),
+      h("div",{style:{fontSize:11,color:T.muted,marginBottom:10}},`يُعرض: ${filtered.length}`),
+      h("div",{style:{overflowX:"auto"}},
+        h("table",null,
+          h("thead",null,h("tr",{style:{borderBottom:`2px solid ${T.border}`}},
+            ["#","اسم الكتاب","المصدر","عدد مرات الاستخدام","تاريخ الإضافة"].map(hd=>
+              h("th",{key:hd,style:{color:T.muted,fontWeight:500,fontSize:11,paddingBottom:10,whiteSpace:"nowrap",textAlign:"right"}},hd))
+          )),
+          h("tbody",null,filtered.map((b,i)=>{
+            let domain="—";
+            if(b.sourceUrl){try{domain=new URL(b.sourceUrl).hostname.replace(/^www\./,"");}catch{}}
+            return h("tr",{key:b.id||i,style:{borderBottom:`1px solid ${T.border}20`}},
+              h("td",{className:"mono",style:{color:T.dim,fontSize:11}},i+1),
+              h("td",{style:{fontSize:13,maxWidth:280,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},b.bookName||b.bookQuery||"—"),
+              h("td",{style:{color:T.textMid,fontSize:11}},
+                b.sourceUrl?h("a",{href:b.sourceUrl,target:"_blank",rel:"noopener",style:{color:T.blue,textDecoration:"none"}},domain):"—"
+              ),
+              h("td",{className:"mono",style:{color:b.timesServed>0?T.gold:T.muted,fontWeight:600}},b.timesServed||0),
+              h("td",{className:"mono",style:{color:T.muted,fontSize:11}},
+                b.createdAt?new Date(b.createdAt).toLocaleDateString("ar-EG"):"—")
+            );
+          }))
+        )
+      )
+    )
+  );
+}
+
+// ── Recent Searches Tab ────────────────────────────────────────
+function RecentTab({searches}){
+  const [filter,setFilter]=useState("all");
+  if(!searches) return h(Card,null,h(Sk,{h:300}));
+  const filtered=searches.filter(s=>{
+    if(filter==="success")return s.bookFound===true;
+    if(filter==="failed")return s.bookFound===false;
+    if(filter==="downloaded")return s.pdfSent===true;
+    return true;
+  });
+  const total=searches.length;
+  const ok=searches.filter(s=>s.bookFound===true).length;
+  const dl=searches.filter(s=>s.pdfSent===true).length;
+  const FilterBtn=({id,label,count})=>h("button",{onClick:()=>setFilter(id),style:{
+    background:filter===id?T.goldDim+"40":"transparent",border:`1px solid ${filter===id?T.gold:T.border}`,
+    color:filter===id?T.gold:T.muted,padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:filter===id?600:400}},
+    `${label} (${count})`);
+  return h("div",{className:"fade-up"},
+    h(Card,null,
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:8}},
+        h(SH,{icon:"🕐",title:`آخر الطلبات — ${total} طلب`}),
+        h(Btn,{variant:"ghost",onClick:()=>exportCSV("recent-searches",searches,[
+          {key:"createdAt",label:"الوقت"},
+          {key:"userName",label:"المستخدم"},
+          {key:"telegramUserId",label:"Telegram ID"},
+          {key:"query",label:"الاستعلام"},
+          {key:"resultCount",label:"النتائج"},
+          {key:"bookFound",label:"وُجد"},
+          {key:"pdfSent",label:"اتسلّم"},
+        ])},"📥 تصدير CSV")
+      ),
+      h("div",{style:{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}},
+        h(FilterBtn,{id:"all",label:"الكل",count:total}),
+        h(FilterBtn,{id:"success",label:"✅ نجاح",count:ok}),
+        h(FilterBtn,{id:"failed",label:"❌ فشل",count:total-ok}),
+        h(FilterBtn,{id:"downloaded",label:"📥 تم الإرسال",count:dl})
+      ),
+      h("div",{style:{overflowX:"auto"}},
+        h("table",null,
+          h("thead",null,h("tr",{style:{borderBottom:`2px solid ${T.border}`}},
+            ["#","الوقت","المستخدم","الطلب","نتائج","الحالة"].map(hd=>
+              h("th",{key:hd,style:{color:T.muted,fontWeight:500,fontSize:11,paddingBottom:10,whiteSpace:"nowrap",textAlign:"right"}},hd))
+          )),
+          h("tbody",null,filtered.slice(0,100).map((s,i)=>{
+            const ago=s.createdAt?Math.floor((Date.now()-new Date(s.createdAt).getTime())/60000):0;
+            const agoStr=ago<60?`${ago}د`:ago<1440?`${Math.floor(ago/60)}س`:`${Math.floor(ago/1440)}ي`;
+            return h("tr",{key:s.id||i,style:{borderBottom:`1px solid ${T.border}20`}},
+              h("td",{className:"mono",style:{color:T.dim,fontSize:11}},i+1),
+              h("td",{className:"mono",style:{color:T.muted,fontSize:11}},agoStr),
+              h("td",{style:{fontSize:12,color:T.textMid}},s.userName||h("span",{className:"mono",style:{color:T.dim,fontSize:10}},s.telegramUserId||"—")),
+              h("td",{style:{fontSize:12,maxWidth:280,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.query||"—"),
+              h("td",{className:"mono",style:{color:T.muted,fontSize:11}},s.resultCount||0),
+              h("td",null,
+                s.pdfSent?h("span",{style:{color:T.gold,fontSize:11,fontWeight:600}},"📥 تم الإرسال"):
+                s.bookFound?h("span",{style:{color:T.green,fontSize:11,fontWeight:600}},"✅ وُجد"):
+                h("span",{style:{color:T.red,fontSize:11,fontWeight:600}},"❌ فشل"))
+            );
+          }))
+        )
+      )
+    )
+  );
+}
+
+// ── Failed Searches Tab ────────────────────────────────────────
+function FailedTab({failed}){
+  const [search,setSearch]=useState("");
+  if(!failed) return h(Card,null,h(Sk,{h:300}));
+  const filtered=failed.filter(f=>!search.trim()||(f.query||"").toLowerCase().includes(search.toLowerCase()));
+  const totalHits=failed.reduce((s,f)=>s+(f.times||0),0);
+  return h("div",{className:"fade-up"},
+    h(Card,null,
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:8}},
+        h(SH,{icon:"❌",title:`أكتر الطلبات الفاشلة — ${failed.length} استعلام مختلف · ${totalHits} محاولة`}),
+        h(Btn,{variant:"ghost",onClick:()=>exportCSV("failed-searches",failed,[
+          {key:"query",label:"الاستعلام"},
+          {key:"times",label:"عدد المحاولات"},
+          {key:"users",label:"عدد المستخدمين"},
+          {key:"lastTry",label:"آخر محاولة",get:r=>r.lastTry?new Date(r.lastTry).toISOString():""}
+        ])},"📥 تصدير CSV")
+      ),
+      h("div",{style:{fontSize:11,color:T.textMid,marginBottom:14,padding:"8px 12px",background:T.redDim+"33",borderRadius:8,borderRight:`3px solid ${T.red}`}},
+        "💡 الكتب اللي ناس طلبتها وفشل البوت يلاقيها — فرصة تضيف مصادر جديدة أو تحسّن البحث"),
+      h("div",{style:{marginBottom:12}},
+        h("input",{value:search,onChange:e=>setSearch(e.target.value),
+          placeholder:"🔍 ابحث في الطلبات الفاشلة...",style:{width:"100%",maxWidth:380,direction:"rtl"}})
+      ),
+      h("div",{style:{overflowX:"auto"}},
+        h("table",null,
+          h("thead",null,h("tr",{style:{borderBottom:`2px solid ${T.border}`}},
+            ["#","الاستعلام","عدد المحاولات","مستخدمين","آخر محاولة"].map(hd=>
+              h("th",{key:hd,style:{color:T.muted,fontWeight:500,fontSize:11,paddingBottom:10,whiteSpace:"nowrap",textAlign:"right"}},hd))
+          )),
+          h("tbody",null,filtered.slice(0,200).map((f,i)=>{
+            const ago=f.lastTry?Math.floor((Date.now()-new Date(f.lastTry).getTime())/3600000):0;
+            const agoStr=ago<1?"أقل من ساعة":ago<24?`${ago} ساعة`:`${Math.floor(ago/24)} يوم`;
+            return h("tr",{key:i,style:{borderBottom:`1px solid ${T.border}20`}},
+              h("td",{className:"mono",style:{color:T.dim,fontSize:11}},i+1),
+              h("td",{style:{fontSize:13,maxWidth:340,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},f.query||"—"),
+              h("td",{className:"mono",style:{color:f.times>=3?T.red:T.orange,fontWeight:700}},f.times),
+              h("td",{className:"mono",style:{color:T.muted}},f.users),
+              h("td",{className:"mono",style:{color:T.muted,fontSize:11}},agoStr)
+            );
+          }))
+        )
+      )
+    )
+  );
+}
+
+// ── Heatmap (hour × day-of-week) ───────────────────────────────
+function Heatmap({data}){
+  if(!data) return h(Card,null,h(Sk,{h:240}));
+  const days=["أحد","اثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"];
+  const max=data.max||1;
+  const cellColor=(v)=>{
+    if(!v) return T.dim;
+    const intensity=v/max;
+    // gold gradient
+    const alpha=Math.max(0.15,intensity);
+    return `rgba(212,168,67,${alpha.toFixed(2)})`;
+  };
+  return h(Card,null,
+    h(SH,{icon:"🔥",title:"خريطة النشاط — يوم الأسبوع × ساعة (UTC)"}),
+    h("div",{style:{overflowX:"auto"}},
+      h("table",{style:{borderSpacing:2,borderCollapse:"separate",fontSize:10}},
+        h("thead",null,h("tr",null,
+          h("th",{style:{padding:"4px 6px",color:T.muted,fontWeight:500}}," "),
+          ...Array.from({length:24},(_,h2)=>h("th",{key:h2,style:{padding:"4px 2px",color:T.muted,fontSize:9,fontWeight:500,textAlign:"center",minWidth:18}},h2))
+        )),
+        h("tbody",null,days.map((dn,d)=>
+          h("tr",{key:d},
+            h("td",{style:{padding:"3px 8px",color:T.muted,fontWeight:500,whiteSpace:"nowrap",fontSize:11}},dn),
+            ...Array.from({length:24},(_,h2)=>{
+              const v=data.matrix?.[d]?.[h2]||0;
+              return h("td",{key:h2,title:`${dn} ${h2}:00 → ${v} بحث`,style:{
+                background:cellColor(v),width:18,height:22,borderRadius:3,
+                textAlign:"center",color:v>max*0.5?T.bg:T.muted,fontSize:9,fontWeight:600,cursor:"default"
+              }},v||"")
+            })
+          )
+        ))
+      )
+    ),
+    h("div",{style:{display:"flex",alignItems:"center",gap:8,marginTop:10,fontSize:11,color:T.muted,justifyContent:"flex-end"}},
+      h("span",null,"أقل"),
+      ...[0.15,0.35,0.55,0.75,1].map((a,i)=>h("span",{key:i,style:{width:18,height:14,background:`rgba(212,168,67,${a})`,borderRadius:2}})),
+      h("span",null,"أكثر")
+    )
+  );
+}
+
+// ── User Drilldown Modal ───────────────────────────────────────
+function UserModal({userId,onClose,onAction}){
+  const [data,setData]=useState(null);
+  useEffect(()=>{
+    if(!userId) return;
+    apiFetch(`db/user/${userId}/full`).then(d=>setData(d)).catch(()=>setData({user:null}));
+  },[userId]);
+  if(!userId) return null;
+  const close=(e)=>{ if(e.target===e.currentTarget) onClose(); };
+  return h("div",{onClick:close,style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",backdropFilter:"blur(4px)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:16}},
+    h("div",{style:{background:T.surface,border:`1px solid ${T.border}`,borderRadius:14,maxWidth:720,width:"100%",maxHeight:"90vh",overflow:"auto",padding:20,position:"relative"}},
+      h("button",{onClick:onClose,style:{position:"absolute",left:14,top:14,background:"transparent",border:`1px solid ${T.border}`,color:T.muted,width:32,height:32,borderRadius:8,fontSize:14,cursor:"pointer"}},"✕"),
+      !data&&h(Sk,{h:300}),
+      data&&!data.user&&h("div",{style:{textAlign:"center",padding:30,color:T.muted}},"المستخدم غير موجود"),
+      data&&data.user&&(()=>{
+        const u=data.user;
+        const sr=u.totalSearches>0?((u.totalDownloads/u.totalSearches)*100).toFixed(1):"0";
+        const last7=(data.daily||[]).slice(-7);
+        return h("div",null,
+          // Header
+          h("div",{style:{display:"flex",alignItems:"flex-start",gap:14,marginBottom:18}},
+            h("div",{style:{width:60,height:60,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldDim})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,fontWeight:700,color:T.bg}},
+              (u.firstName||"?").charAt(0).toUpperCase()),
+            h("div",{style:{flex:1}},
+              h("div",{style:{fontSize:18,fontWeight:700,color:T.text,marginBottom:2}},u.firstName||"بدون اسم"),
+              h("div",{style:{fontSize:13,color:T.muted,marginBottom:4}},u.username?`@${u.username}`:"—"),
+              h("div",{className:"mono",style:{fontSize:11,color:T.dim}},`Telegram ID: ${u.telegramId}`),
+              h("div",{style:{display:"flex",gap:6,marginTop:6}},
+                data.premium&&h("span",{style:{fontSize:10,padding:"2px 8px",background:T.goldDim+"60",color:T.gold,borderRadius:6,fontWeight:600}},"⭐ مميز"),
+                data.banned&&h("span",{style:{fontSize:10,padding:"2px 8px",background:T.redDim+"60",color:T.red,borderRadius:6,fontWeight:600}},"🚫 محظور")
+              )
+            )
+          ),
+          // KPIs
+          h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(120px,1fr))",gap:10,marginBottom:18}},
+            [
+              {label:"إجمالي البحث",value:u.totalSearches,color:T.blue},
+              {label:"إجمالي التحميل",value:u.totalDownloads,color:T.gold},
+              {label:"نسبة التحميل",value:sr+"%",color:+sr>=70?T.green:+sr>=40?T.orange:T.red},
+              {label:"تحميلات اليوم",value:data.todayDownloads||0,color:T.purple},
+            ].map((k,i)=>h("div",{key:i,style:{background:T.card,border:`1px solid ${T.border}`,padding:"10px 12px",borderRadius:10}},
+              h("div",{style:{fontSize:10,color:T.muted,marginBottom:3}},k.label),
+              h("div",{className:"mono",style:{fontSize:18,fontWeight:700,color:k.color}},k.value)
+            ))
+          ),
+          // Daily chart
+          last7.length>0&&h("div",{style:{marginBottom:18}},
+            h("div",{style:{fontSize:12,color:T.muted,marginBottom:8,fontWeight:600}},`نشاط آخر ${last7.length} يوم`),
+            h(SafeChart,{fallback:h("div",{style:{color:T.muted,fontSize:11}},"⚠️ تعذّر تحميل المخطط")},
+              h(ResponsiveContainer,{width:"100%",height:140},
+                h(AreaChart,{data:last7,margin:{top:4,right:4,left:-24,bottom:0}},
+                  h(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),
+                  h(XAxis,{dataKey:"day",tick:{fontSize:10,fill:T.muted},stroke:T.border,tickFormatter:d=>d?.slice(5)||""}),
+                  h(YAxis,{tick:{fontSize:9,fill:T.muted},stroke:T.border}),
+                  h(Tooltip,{content:h(CT)}),
+                  h(Area,{type:"monotone",dataKey:"searches",name:"بحث",stroke:T.blue,fill:T.blue+"33",strokeWidth:2}),
+                  h(Area,{type:"monotone",dataKey:"downloads",name:"تحميل",stroke:T.gold,fill:T.gold+"33",strokeWidth:2})
+                )
+              )
+            )
+          ),
+          // Quick actions
+          h("div",{style:{display:"flex",gap:8,flexWrap:"wrap",marginBottom:18,paddingBottom:14,borderBottom:`1px solid ${T.border}`}},
+            h(Btn,{variant:data.premium?"ghost":"gold",onClick:()=>onAction(data.premium?"revokePrem":"grantPrem",u.telegramId)},
+              data.premium?"❌ إلغاء التميز":"⭐ منح تميز"),
+            h(Btn,{variant:data.banned?"success":"danger",onClick:()=>onAction(data.banned?"unban":"ban",u.telegramId)},
+              data.banned?"✅ رفع الحظر":"🚫 حظر")
+          ),
+          // Recent searches
+          h("div",null,
+            h("div",{style:{fontSize:12,color:T.muted,marginBottom:8,fontWeight:600,display:"flex",justifyContent:"space-between",alignItems:"center"}},
+              h("span",null,`آخر ${(data.recentSearches||[]).length} بحث`),
+              data.recentSearches?.length>0&&h(Btn,{variant:"ghost",onClick:()=>exportCSV(`user-${u.telegramId}-searches`,data.recentSearches,[
+                {key:"createdAt",label:"الوقت"},
+                {key:"query",label:"الاستعلام"},
+                {key:"bookFound",label:"وُجد"},
+                {key:"pdfSent",label:"اتسلّم"},
+                {key:"resultCount",label:"عدد النتائج"},
+              ])},"📥 CSV")
+            ),
+            h("div",{style:{maxHeight:280,overflowY:"auto",border:`1px solid ${T.border}`,borderRadius:8}},
+              h("table",{style:{width:"100%"}},
+                h("tbody",null,(data.recentSearches||[]).map((s,i)=>{
+                  const ago=s.createdAt?Math.floor((Date.now()-new Date(s.createdAt).getTime())/60000):0;
+                  const agoStr=ago<60?`${ago}د`:ago<1440?`${Math.floor(ago/60)}س`:`${Math.floor(ago/1440)}ي`;
+                  return h("tr",{key:s.id||i,style:{borderBottom:`1px solid ${T.border}30`}},
+                    h("td",{className:"mono",style:{color:T.muted,fontSize:10,padding:"6px 10px",whiteSpace:"nowrap"}},agoStr),
+                    h("td",{style:{fontSize:12,padding:"6px 4px",color:T.text,maxWidth:300,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.query),
+                    h("td",{style:{padding:"6px 10px",textAlign:"left"}},
+                      s.pdfSent?h("span",{style:{color:T.gold,fontSize:11}},"📥"):
+                      s.bookFound?h("span",{style:{color:T.green,fontSize:11}},"✅"):
+                      h("span",{style:{color:T.red,fontSize:11}},"❌"))
+                  );
+                }))
+              )
+            )
+          )
+        );
+      })()
+    )
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// DASH 2.0 — new components (palette, help, bell, refresh, FAB,
+// trace waterfall, logs, backup, costs, source sparkline)
+// ══════════════════════════════════════════════════════════════
+
+// ── Trace Waterfall ───────────────────────────────────────────
+// رسم gantt أفقي لمراحل الـ request — أوضح من قائمة نصية. كل bar
+// نسبة عرضه = نسبة وقت المرحلة من إجمالي الـ trace.
+function TraceWaterfall({trace}){
+  if(!trace?.phases?.length) return null;
+  const total = trace.totalMs || trace.phases.reduce((s,p)=>s+(p.data?.ms||0),0) || 1;
+  const colors = {
+    request_started:T.muted, search_done:T.blue, verify_done:T.purple,
+    download_started:T.orange, download_done:T.green, request_done:T.gold,
+  };
+  let acc = 0;
+  return h("div",{style:{marginTop:14,display:"flex",flexDirection:"column",gap:4}},
+    h("div",{style:{fontSize:11,color:T.muted,marginBottom:4,fontWeight:600}},
+      `🌊 المخطط الزمني — ${total}ms إجمالي`),
+    trace.phases.map((p,i)=>{
+      const ms = p.data?.ms||0;
+      const widthPct = Math.max(2,(ms/total)*100);
+      const offsetPct = (acc/total)*100;
+      acc += ms;
+      const c = colors[p.name]||T.gold;
+      return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:8,fontSize:11}},
+        h("span",{style:{width:130,color:T.text,fontWeight:500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",flexShrink:0}},p.name),
+        h("div",{style:{flex:1,height:18,background:T.surface,borderRadius:3,position:"relative",overflow:"hidden"}},
+          h("div",{title:`${ms}ms`,style:{position:"absolute",left:`${offsetPct}%`,top:0,height:"100%",
+            width:`${widthPct}%`,background:c,borderRadius:3,transition:"width .3s"}})
+        ),
+        h("span",{className:"mono",style:{width:60,textAlign:"left",color:c,fontWeight:700,flexShrink:0}},`${ms}ms`)
+      );
+    })
+  );
+}
+
+// ── Help / Keyboard Shortcuts Modal ───────────────────────────
+function HelpModal({onClose}){
+  const shortcuts = [
+    {k:"Ctrl+K",       d:"فتح قائمة الأوامر السريعة (بحث وتنقل)"},
+    {k:"r",            d:"تحديث البيانات الآن"},
+    {k:"?",            d:"إظهار هذه القائمة"},
+    {k:"g ثم o",       d:"الانتقال إلى نظرة عامة"},
+    {k:"g ثم a",       d:"الانتقال إلى التحليلات"},
+    {k:"g ثم b",       d:"الانتقال إلى الكتب"},
+    {k:"g ثم c",       d:"الانتقال إلى الكاش"},
+    {k:"g ثم q",       d:"الانتقال إلى الطابور"},
+    {k:"g ثم u",       d:"الانتقال إلى المستخدمين"},
+    {k:"g ثم s",       d:"الانتقال إلى المصادر"},
+    {k:"g ثم t",       d:"الانتقال إلى Telemetry"},
+    {k:"g ثم l",       d:"الانتقال إلى Logs"},
+    {k:"g ثم m",       d:"الانتقال إلى النظام"},
+    {k:"Esc",          d:"إغلاق أي نافذة"},
+  ];
+  return h("div",{onClick:onClose,style:{
+    position:"fixed",inset:0,background:"rgba(0,0,0,.7)",zIndex:9999,
+    display:"flex",alignItems:"center",justifyContent:"center",padding:20
+  }},
+    h("div",{onClick:e=>e.stopPropagation(),className:"fade-up",style:{
+      background:T.surface,border:`1px solid ${T.border}`,borderRadius:14,
+      padding:24,maxWidth:520,width:"100%",maxHeight:"82vh",overflowY:"auto",
+      boxShadow:"0 20px 60px rgba(0,0,0,.5)"
+    }},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}},
+        h("div",{style:{fontWeight:800,fontSize:15,color:T.gold}},"⌨️  اختصارات لوحة المفاتيح"),
+        h("button",{onClick:onClose,style:{background:"transparent",border:"none",color:T.muted,fontSize:22,cursor:"pointer"}},"×")
+      ),
+      h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+        shortcuts.map((s,i)=>h("div",{key:i,style:{display:"flex",justifyContent:"space-between",alignItems:"center",
+          padding:"9px 12px",background:T.card,borderRadius:8,border:`1px solid ${T.border}`}},
+          h("span",{style:{fontSize:12,color:T.text}},s.d),
+          h("span",{className:"mono",style:{padding:"3px 8px",background:T.bg,border:`1px solid ${T.border}`,borderRadius:5,fontSize:11,color:T.gold,fontWeight:700}},s.k)
+        ))
+      )
+    )
+  );
+}
+
+// ── Command Palette (Ctrl+K) ──────────────────────────────────
+function CommandPalette({open,onClose,onNavigate,onAction,users,books,traces}){
+  const [q,setQ]=useState("");
+  const [idx,setIdx]=useState(0);
+  const inputRef=useRef(null);
+  useEffect(()=>{ if(open){ setQ(""); setIdx(0); setTimeout(()=>inputRef.current?.focus(),50);} },[open]);
+  const list = (function(){
+    const all = [
+      ...["overview:🏠 نظرة عامة","analytics:📊 التحليلات","books:📚 الكتب","failed:❌ فشل البحث",
+          "cache:💾 مكتبة الكاش","recent:🕐 آخر الطلبات","sources:🔌 المصادر","queue:🔄 الطابور",
+          "users:👥 المستخدمون","system:💻 النظام","telemetry:📡 Telemetry","logs:📜 السجلات"]
+        .map(s=>{ const [id,label]=s.split(":"); return {type:"nav",id,label,sub:"الانتقال"};}),
+      {type:"action",id:"refresh",label:"🔄 تحديث الآن",sub:"إجراء"},
+      {type:"action",id:"help",   label:"❓ عرض المساعدة",sub:"إجراء"},
+      ...(users?.users||[]).slice(0,30).map(u=>({type:"user",id:String(u.userId),label:`👤 ${u.userId}${u.username?" (@"+u.username+")":""}`,sub:`${u.searches||0} بحث`})),
+      ...(books||[]).slice(0,15).map(b=>({type:"book",id:b.title||b.book,label:`📚 ${(b.title||b.book||"").slice(0,60)}`,sub:`${b.count||0} طلب`})),
+      ...(traces||[]).slice(0,10).map(t=>({type:"trace",id:t.id,label:`📡 ${(t.bookName||"").slice(0,50)}`,sub:`#${t.id.slice(0,10)}`})),
+    ];
+    if(!q.trim()) return all.slice(0,40);
+    const qq = q.toLowerCase();
+    return all.filter(x=>x.label.toLowerCase().includes(qq)).slice(0,40);
+  })();
+  const choose = (it)=>{
+    if(!it) return;
+    if(it.type==="nav")    onNavigate(it.id);
+    if(it.type==="action") onAction(it.id);
+    if(it.type==="user")   onAction("user:"+it.id);
+    if(it.type==="trace")  onAction("trace:"+it.id);
+    onClose();
+  };
+  const onKey = (e)=>{
+    if(e.key==="ArrowDown"){ e.preventDefault(); setIdx(i=>Math.min(list.length-1,i+1)); }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); setIdx(i=>Math.max(0,i-1)); }
+    else if(e.key==="Enter"){ e.preventDefault(); choose(list[idx]); }
+    else if(e.key==="Escape"){ onClose(); }
+  };
+  if(!open) return null;
+  return h("div",{onClick:onClose,style:{
+    position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:10000,
+    display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"10vh 20px 20px"
+  }},
+    h("div",{onClick:e=>e.stopPropagation(),className:"fade-up",style:{
+      background:T.surface,border:`1px solid ${T.border}`,borderRadius:14,
+      width:"100%",maxWidth:560,boxShadow:"0 20px 60px rgba(0,0,0,.5)",overflow:"hidden",direction:"rtl"
+    }},
+      h("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"14px 16px",borderBottom:`1px solid ${T.border}`}},
+        h("span",{style:{fontSize:18,color:T.gold}},"⌨"),
+        h("input",{ref:inputRef,value:q,onChange:e=>{setQ(e.target.value);setIdx(0);},
+          onKeyDown:onKey,placeholder:"ابحث: مستخدم، كتاب، أو إجراء…",
+          style:{flex:1,background:"transparent",border:"none",outline:"none",fontSize:14,color:T.text}}),
+        h("span",{className:"mono",style:{padding:"3px 8px",background:T.bg,border:`1px solid ${T.border}`,borderRadius:5,fontSize:10,color:T.muted,whiteSpace:"nowrap"}},"Esc للإغلاق")
+      ),
+      h("div",{style:{maxHeight:"58vh",overflowY:"auto"}},
+        list.length===0 && h("div",{style:{padding:"24px 20px",textAlign:"center",color:T.muted,fontSize:13}},"لا نتائج"),
+        list.map((it,i)=>h("div",{key:`${it.type}:${it.id}:${i}`,onClick:()=>choose(it),onMouseEnter:()=>setIdx(i),
+          style:{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",cursor:"pointer",
+            background: i===idx ? T.goldDim+"22" : "transparent",
+            borderRight: i===idx ? `2px solid ${T.gold}` : "2px solid transparent"}},
+          h("span",{style:{flex:1,fontSize:13,color:i===idx?T.gold:T.text,fontWeight:i===idx?600:400,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},it.label),
+          h("span",{style:{fontSize:11,color:T.muted}},it.sub)
+        ))
+      ),
+      h("div",{style:{padding:"8px 16px",borderTop:`1px solid ${T.border}`,fontSize:11,color:T.muted,display:"flex",gap:14}},
+        h("span",null,"↑↓ للتنقل"),
+        h("span",null,"↵ للاختيار"),
+        h("span",null,`${list.length} نتيجة`)
+      )
+    )
+  );
+}
+
+// ── Notification Bell — uses log buffer to surface recent ERROR/WARN ──
+function NotificationBell({logs,onClick}){
+  const issues = (logs?.lines||[]).filter(l=>l.level==="ERROR"||l.level==="WARN").slice(-20).reverse();
+  const recent = issues.filter(l=>Date.now()-l.ts < 30*60*1000); // last 30min
+  const [open,setOpen]=useState(false);
+  const ref=useRef(null);
+  useEffect(()=>{
+    if(!open) return;
+    const fn = (e)=>{ if(ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown",fn);
+    return ()=>document.removeEventListener("mousedown",fn);
+  },[open]);
+  return h("div",{ref,style:{position:"relative"}},
+    h("button",{onClick:()=>setOpen(o=>!o),"aria-label":"تنبيهات",style:{
+      background:"transparent",border:`1px solid ${T.border}`,color:T.muted,
+      width:34,height:34,borderRadius:8,cursor:"pointer",fontSize:15,position:"relative"
+    }},"🔔",
+      recent.length>0 && h("span",{style:{position:"absolute",top:-4,left:-4,background:T.red,color:"#fff",
+        fontSize:9,fontWeight:800,borderRadius:10,padding:"1px 5px",minWidth:16,textAlign:"center"}},recent.length)
+    ),
+    open && h("div",{className:"fade-up",style:{
+      position:"absolute",top:"calc(100% + 8px)",left:0,zIndex:200,
+      width:340,background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,
+      boxShadow:"0 12px 40px rgba(0,0,0,.4)",overflow:"hidden"
+    }},
+      h("div",{style:{padding:"12px 14px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between"}},
+        h("span",{style:{fontWeight:700,fontSize:13,color:T.gold}},"🔔 تنبيهات حديثة"),
+        h("span",{style:{fontSize:11,color:T.muted}},`${issues.length} مدخل`)
+      ),
+      h("div",{style:{maxHeight:360,overflowY:"auto"}},
+        issues.length===0 && h("div",{style:{padding:"22px 16px",textAlign:"center",color:T.muted,fontSize:12}},"لا تنبيهات — كل شيء على ما يرام"),
+        issues.map((l,i)=>{
+          const c = l.level==="ERROR" ? T.red : T.orange;
+          const ago = Math.floor((Date.now()-l.ts)/1000);
+          const agoStr = ago<60?`${ago}ث`:ago<3600?`${Math.floor(ago/60)}د`:`${Math.floor(ago/3600)}س`;
+          return h("div",{key:i,style:{padding:"10px 14px",borderBottom:i<issues.length-1?`1px solid ${T.border}55`:"none"}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}},
+              h("span",{style:{fontSize:11,fontWeight:700,color:c}},`${l.level} • ${l.ns}`),
+              h("span",{style:{fontSize:10,color:T.muted}},agoStr)
+            ),
+            h("div",{style:{fontSize:12,color:T.text,lineHeight:1.4}},(l.msg||"").slice(0,120))
+          );
+        })
+      ),
+      h("div",{style:{padding:"8px 14px",borderTop:`1px solid ${T.border}`}},
+        h("button",{onClick:()=>{ setOpen(false); onClick?.(); },style:{
+          background:"transparent",border:"none",color:T.gold,fontSize:11,cursor:"pointer",fontWeight:600
+        }},"عرض كل السجلات →")
+      )
+    )
+  );
+}
+
+// ── Auto-Refresh Control ──────────────────────────────────────
+function AutoRefreshControl({intervalMs,setIntervalMs,onRefreshNow,lastTs}){
+  const [open,setOpen]=useState(false);
+  const ref=useRef(null);
+  useEffect(()=>{
+    if(!open) return;
+    const fn = (e)=>{ if(ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown",fn);
+    return ()=>document.removeEventListener("mousedown",fn);
+  },[open]);
+  const [now,setNow]=useState(Date.now());
+  useEffect(()=>{ const t=setInterval(()=>setNow(Date.now()),500); return ()=>clearInterval(t); },[]);
+  const elapsed = now - (lastTs||now);
+  const remainingMs = intervalMs ? Math.max(0, intervalMs - elapsed) : 0;
+  const pct = intervalMs ? Math.max(0, 1 - elapsed/intervalMs) : 0;
+  const opts = [
+    {ms:0,         label:"إيقاف"},
+    {ms:10000,     label:"10 ث"},
+    {ms:30000,     label:"30 ث"},
+    {ms:60000,     label:"1 د"},
+    {ms:5*60*1000, label:"5 د"},
+  ];
+  const current = opts.find(o=>o.ms===intervalMs)?.label || "30 ث";
+  const size = 32, r = 13, c = 2*Math.PI*r;
+  return h("div",{ref,style:{position:"relative"}},
+    h("button",{onClick:()=>setOpen(o=>!o),title:"التحديث التلقائي",style:{
+      background:"transparent",border:`1px solid ${T.border}`,padding:"4px 10px",
+      borderRadius:8,cursor:"pointer",display:"flex",alignItems:"center",gap:8,
+      color:T.text,fontSize:12,height:34
+    }},
+      // mini countdown ring
+      h("svg",{width:size,height:size,style:{transform:"rotate(-90deg)"}},
+        h("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:T.border,strokeWidth:2}),
+        intervalMs>0 && h("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:T.gold,strokeWidth:2,
+          strokeDasharray:c,strokeDashoffset:c*(1-pct),strokeLinecap:"round",style:{transition:"stroke-dashoffset 0.3s linear"}})
+      ),
+      h("span",null,intervalMs===0?"إيقاف":current),
+      h("span",{style:{color:T.muted,fontSize:10}},"▾")
+    ),
+    open && h("div",{className:"fade-up",style:{
+      position:"absolute",top:"calc(100% + 6px)",left:0,zIndex:200,
+      background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,
+      boxShadow:"0 8px 24px rgba(0,0,0,.4)",minWidth:160,padding:6
+    }},
+      opts.map(o=>h("button",{key:o.ms,onClick:()=>{setIntervalMs(o.ms);setOpen(false);},style:{
+        display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",
+        background: o.ms===intervalMs ? T.goldDim+"30" : "transparent",
+        border:"none",color:o.ms===intervalMs?T.gold:T.text,
+        padding:"8px 12px",borderRadius:6,cursor:"pointer",fontSize:12,textAlign:"right"
+      }}, o.label, o.ms===intervalMs ? h("span",{style:{color:T.gold}},"✓") : null)),
+      h("div",{style:{borderTop:`1px solid ${T.border}`,marginTop:4,paddingTop:4}},
+        h("button",{onClick:()=>{ onRefreshNow(); setOpen(false); },style:{
+          width:"100%",background:T.goldDim+"30",border:`1px solid ${T.goldDim}`,color:T.gold,
+          padding:"7px 12px",borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600
+        }},"🔄 تحديث الآن")
+      )
+    )
+  );
+}
+
+// ── Quick Actions FAB ─────────────────────────────────────────
+function QuickActionsFAB({onPalette,onMaint,maintenance}){
+  const [open,setOpen]=useState(false);
+  const actions = [
+    {id:"palette",icon:"⌨️",label:"قائمة الأوامر (Ctrl+K)",onClick:onPalette,color:T.gold},
+    {id:"maint",icon:maintenance?"✅":"🔴",label:maintenance?"إيقاف الصيانة":"تفعيل الصيانة",onClick:onMaint,color:maintenance?T.green:T.red},
+  ];
+  return h("div",{style:{position:"fixed",bottom:20,left:20,zIndex:90}},
+    open && h("div",{className:"fade-up",style:{
+      position:"absolute",bottom:60,left:0,display:"flex",flexDirection:"column",gap:8
+    }},
+      actions.map(a=>h("button",{key:a.id,onClick:()=>{a.onClick();setOpen(false);},style:{
+        background:T.surface,border:`1px solid ${a.color}55`,color:a.color,
+        padding:"10px 14px",borderRadius:10,fontSize:12,fontWeight:600,
+        whiteSpace:"nowrap",cursor:"pointer",boxShadow:"0 4px 14px rgba(0,0,0,.3)",display:"flex",alignItems:"center",gap:8
+      }}, h("span",null,a.icon)," ",a.label))
+    ),
+    h("button",{onClick:()=>setOpen(o=>!o),"aria-label":"إجراءات سريعة",style:{
+      width:50,height:50,borderRadius:"50%",border:"none",cursor:"pointer",
+      background:`linear-gradient(135deg,${T.goldDim},${T.gold})`,
+      color:"#1a1208",fontSize:22,fontWeight:800,
+      boxShadow:`0 8px 24px ${T.gold}55`,
+      transition:"transform .2s",transform:open?"rotate(45deg)":"rotate(0)"
+    }},"+")
+  );
+}
+
+// ── Backup Status Card ────────────────────────────────────────
+function BackupCard({backup}){
+  if(!backup) return h(Card,null,h(SH,{icon:"💾",title:"النسخ الاحتياطي"}),h(Sk,{h:120}));
+  const {dirOk,latest,ageHours,total,healthy,retention,files,dir} = backup;
+  if(!dirOk) return h(Card,null,
+    h(SH,{icon:"💾",title:"النسخ الاحتياطي"}),
+    h("div",{style:{padding:"10px 12px",background:T.redDim+"30",border:`1px solid ${T.red}55`,borderRadius:8,color:T.red,fontSize:12}},
+      `🚫 المسار ${dir} غير متاح للـ container — أضف volume mount أو غيّر BACKUP_DIR`)
+  );
+  if(!latest) return h(Card,null,
+    h(SH,{icon:"💾",title:"النسخ الاحتياطي"}),
+    h("div",{style:{padding:"10px 12px",background:T.redDim+"30",border:`1px solid ${T.red}55`,borderRadius:8,color:T.red,fontSize:12}},
+      `❌ لا توجد نسخ احتياطية في ${dir} — تأكّد إن الـ cron شغّال`)
+  );
+  const sizeKB = Math.round(latest.size/1024);
+  const ageStr = ageHours==null ? "—" : ageHours<1 ? "أحدث من ساعة" : `${ageHours} ساعة`;
+  const dt = new Date(latest.mtime);
+  const dtStr = dt.toLocaleString("ar-EG",{dateStyle:"short",timeStyle:"short"});
+  return h(Card,null,
+    h(SH,{icon:"💾",title:"النسخ الاحتياطي اليومي"}),
+    h("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10,marginBottom:14}},
+      [["الحالة",healthy?"🟢 صحّية":"⚠️ قديمة",healthy?T.green:T.orange],
+       ["العمر",ageStr,healthy?T.text:T.orange],
+       ["حجم آخر نسخة",`${sizeKB} KB`,T.blue],
+       ["النسخ المحفوظة",`${total} / ${retention} يوم`,T.gold]]
+      .map(([l,v,c])=>h("div",{key:l,style:{padding:"10px 12px",background:T.surface,borderRadius:8,border:`1px solid ${T.border}`}},
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:3}},l),
+        h("div",{className:"mono",style:{fontWeight:700,fontSize:13,color:c}},v)
+      ))
+    ),
+    h("div",{style:{fontSize:11,color:T.muted,marginBottom:8}},
+      `آخر نسخة: ${latest.name} — ${dtStr}`),
+    files?.length>1 && h("details",null,
+      h("summary",{style:{cursor:"pointer",color:T.gold,fontSize:12,padding:"6px 0"}},`📦 كل النسخ (${files.length})`),
+      h("div",{style:{fontSize:11,marginTop:6,maxHeight:160,overflowY:"auto",border:`1px solid ${T.border}`,borderRadius:6}},
+        files.map((f,i)=>h("div",{key:i,style:{padding:"6px 10px",borderBottom:i<files.length-1?`1px solid ${T.border}55`:"none",display:"flex",justifyContent:"space-between",gap:8}},
+          h("span",{className:"mono",style:{color:T.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},f.name),
+          h("span",{style:{color:T.muted,whiteSpace:"nowrap"}},`${Math.round(f.size/1024)} KB`)
+        ))
+      )
+    )
+  );
+}
+
+// ── Costs Card (Firecrawl + AI providers) ─────────────────────
+function CostsCard({costs}){
+  if(!costs) return h(Card,null,h(SH,{icon:"💰",title:"التكلفة التقريبية"}),h(Sk,{h:120}));
+  const fc = costs.firecrawl||{};
+  const providers = Object.entries(costs.aiByProvider||{}).sort(([,a],[,b])=>b-a);
+  const totalAi = providers.reduce((s,[,v])=>s+v,0);
+  return h(Card,null,
+    h(SH,{icon:"💰",title:"التكلفة التقريبية الشهرية",actions:
+      h(Tag,{color:T.muted,size:10},"تقدير — راجع فواتير المزوّد")
+    }),
+    h("div",{style:{display:"flex",gap:18,alignItems:"center",marginBottom:14,flexWrap:"wrap"}},
+      h("div",null,
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:4}},"إجمالي تقديري الشهر"),
+        h("div",{style:{fontSize:28,fontWeight:800,color:T.gold,fontFamily:"'IBM Plex Mono',monospace"}},`$${(costs.estimatedMonthUsd||0).toFixed(2)}`)
+      ),
+      h("div",{style:{height:48,width:1,background:T.border}}),
+      h("div",null,
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:4}},"Firecrawl credits (الشهر)"),
+        h("div",{className:"mono",style:{fontSize:18,fontWeight:700,color:T.blue}},(fc.month||0).toLocaleString())
+      ),
+      h("div",null,
+        h("div",{style:{fontSize:11,color:T.muted,marginBottom:4}},"AI calls (الشهر)"),
+        h("div",{className:"mono",style:{fontSize:18,fontWeight:700,color:T.purple}},totalAi.toLocaleString())
+      )
+    ),
+    providers.length>0 && h("div",null,
+      h("div",{style:{fontSize:11,color:T.muted,marginBottom:6,fontWeight:600}},"التوزيع حسب المزوّد:"),
+      h("div",{style:{display:"flex",flexDirection:"column",gap:5}},
+        providers.map(([p,v])=>{
+          const pct = totalAi>0 ? (v/totalAi)*100 : 0;
+          return h("div",{key:p,style:{display:"flex",alignItems:"center",gap:8,fontSize:11}},
+            h("span",{style:{width:90,color:T.text}},p),
+            h("div",{style:{flex:1,height:8,background:T.surface,borderRadius:4,overflow:"hidden"}},
+              h("div",{style:{height:"100%",width:`${pct}%`,background:T.purple,borderRadius:4}})
+            ),
+            h("span",{className:"mono",style:{width:64,textAlign:"left",color:T.text,fontWeight:700}},v.toLocaleString())
+          );
+        })
+      )
+    ),
+    !providers.length && h("div",{style:{fontSize:11,color:T.muted,padding:"12px 0"}},"لا توجد بيانات استدعاءات بعد لهذا الشهر")
+  );
+}
+
+// ── Source Sparkline (mini line chart of last 7d success rate) ──
+function SourceSparkline({values=[],color=T.gold,w=64,h:height=22}){
+  if(!values.length) return h("div",{style:{width:w,height,color:T.muted,fontSize:10,textAlign:"center"}},"—");
+  const max = Math.max(...values, 1);
+  const points = values.map((v,i)=>{
+    const x = (i/(values.length-1||1)) * w;
+    const y = height - (v/max)*height + 1;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  return h("svg",{width:w,height,style:{display:"block"}},
+    h("polyline",{points,fill:"none",stroke:color,strokeWidth:1.5,strokeLinejoin:"round",strokeLinecap:"round"})
+  );
+}
+
+// ── Logs Tab — live tail of bot logs from in-memory ring buffer ──
+function LogsTab({logs,onRefresh}){
+  const [level,setLevel]=useState("");
+  const [autoScroll,setAutoScroll]=useState(true);
+  const scrollRef=useRef(null);
+  useEffect(()=>{ if(autoScroll && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; });
+  if(!logs) return h(Card,null,h(Sk,{h:300}));
+  const filtered = level ? (logs.lines||[]).filter(l=>l.level===level) : (logs.lines||[]);
+  const stats = logs.stats||{};
+  const counts = (logs.lines||[]).reduce((m,l)=>{ m[l.level]=(m[l.level]||0)+1; return m; },{});
+  const colors = {DEBUG:T.muted,INFO:T.blue,WARN:T.orange,ERROR:T.red};
+  const Filter = ({lvl})=>h("button",{onClick:()=>setLevel(level===lvl?"":lvl),style:{
+    background: level===lvl ? (colors[lvl]||T.gold)+"22" : "transparent",
+    border:`1px solid ${level===lvl ? (colors[lvl]||T.gold) : T.border}`,
+    color: level===lvl ? (colors[lvl]||T.gold) : T.muted,
+    padding:"4px 10px",borderRadius:6,fontSize:11,fontWeight:600,cursor:"pointer"
+  }}, lvl, " ", h("span",{style:{color:T.muted,marginRight:4}},`(${counts[lvl]||0})`));
+  return h("div",{className:"fade-up"},
+    h(Card,null,
+      h(SH,{icon:"📜",title:`السجلات الحيّة — ${stats.size||0}/${stats.max||0} سطر في الذاكرة`,actions:[
+        h(Btn,{key:"r",onClick:onRefresh,size:"sm"},"🔄 تحديث"),
+      ]}),
+      h("div",{style:{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap",alignItems:"center"}},
+        h("span",{style:{fontSize:11,color:T.muted,marginLeft:4}},"تصفية:"),
+        h(Filter,{lvl:"DEBUG"}),
+        h(Filter,{lvl:"INFO"}),
+        h(Filter,{lvl:"WARN"}),
+        h(Filter,{lvl:"ERROR"}),
+        h("label",{style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:T.muted,cursor:"pointer",marginRight:"auto"}},
+          h("input",{type:"checkbox",checked:autoScroll,onChange:e=>setAutoScroll(e.target.checked),style:{width:14}})," تمرير تلقائي"
+        ),
+        h(Btn,{onClick:()=>{
+          const text = filtered.map(l=>{
+            const ts = new Date(l.ts).toISOString();
+            return `[${ts}] [${l.level}] [${l.ns}] ${l.msg}${l.meta?" "+JSON.stringify(l.meta):""}`;
+          }).join("\n");
+          const blob = new Blob([text],{type:"text/plain"});
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `bot-logs-${new Date().toISOString().slice(0,19).replace(/[:T]/g,"-")}.log`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        },size:"sm"},"⬇ تنزيل")
+      ),
+      h("div",{ref:scrollRef,style:{
+        background:T.bg,border:`1px solid ${T.border}`,borderRadius:8,
+        padding:"8px 10px",height:"60vh",overflowY:"auto",
+        fontFamily:"'IBM Plex Mono',monospace",fontSize:11,direction:"ltr"
+      }},
+        filtered.length===0 && h("div",{style:{color:T.muted,padding:"20px 0",textAlign:"center"}},"لا سطور تطابق الفلتر"),
+        filtered.map((l,i)=>{
+          const ts = new Date(l.ts).toISOString().slice(11,23);
+          const c = colors[l.level]||T.text;
+          return h("div",{key:i,style:{padding:"2px 0",lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word",borderBottom:i<filtered.length-1?`1px solid ${T.border}33`:"none"}},
+            h("span",{style:{color:T.muted}},ts," "),
+            h("span",{style:{color:c,fontWeight:700,minWidth:48,display:"inline-block"}},`[${l.level}]`),
+            h("span",{style:{color:T.purple}},` [${l.ns}]`),
+            h("span",{style:{color:T.text}},` ${l.msg}`),
+            l.meta && h("span",{style:{color:T.muted}},` ${JSON.stringify(l.meta)}`)
+          );
+        })
+      )
+    )
+  );
+}
+
+// ── Topbar Theme/Density toggle (visual density) ──────────────
+function DensityToggle({dense,setDense}){
+  return h("button",{onClick:()=>setDense(!dense),title:dense?"كثافة عالية":"كثافة عادية",
+    style:{background:"transparent",border:`1px solid ${T.border}`,color:T.muted,
+      width:34,height:34,borderRadius:8,cursor:"pointer",fontSize:14}},dense?"▤":"▥");
+}
+
+function App({onLogout}){
+  const [tab,setTab]=useState("overview");
+  // mobile detection — react to viewport changes
+  const [isMobile,setIsMobile]=useState(()=>typeof window!=="undefined"&&window.matchMedia?.("(max-width:768px)").matches);
+  useEffect(()=>{
+    if(typeof window==="undefined") return;
+    const mq=window.matchMedia("(max-width:768px)");
+    const fn=e=>setIsMobile(e.matches);
+    mq.addEventListener?.("change",fn) || mq.addListener?.(fn);
+    return()=>{ mq.removeEventListener?.("change",fn) || mq.removeListener?.(fn); };
+  },[]);
+  const [ov,setOv]=useState(null);
+  const [books,setBooks]=useState([]);
+  const [sources,setSources]=useState([]);
+  const [dlq,setDlq]=useState([]);
+  const [prem,setPrem]=useState([]);
+  const [banned,setBanned]=useState([]);
+  const [allUsers,setAllUsers]=useState(null);   // {users:[],total:0}
+  const [cacheBooks,setCacheBooks]=useState(null);
+  const [recent,setRecent]=useState(null);
+  const [failed,setFailed]=useState(null);
+  const [heatmap,setHeatmap]=useState(null);
+  const [drillId,setDrillId]=useState(null);
+  const [ts,setTs]=useState(Date.now());
+  const [toast,setToast]=useState(null);
+  const [sidebar,setSidebar]=useState(()=>typeof window!=="undefined" ? !window.matchMedia?.("(max-width:768px)").matches : true);
+  const [funnel,setFunnel]=useState(null);
+  const [traces,setTraces]=useState([]);
+  const [isMock,setIsMock]=useState(false);
+  const [ago,setAgo]=useState("الآن");
+  // ── DASH 2.0 state ──────────────────────────────
+  const [logs,setLogs]=useState(null);
+  const [bgLogs,setBgLogs]=useState(null);   // background poll for bell badge
+  const [backup,setBackup]=useState(null);
+  const [costs,setCosts]=useState(null);
+  const [paletteOpen,setPaletteOpen]=useState(false);
+  const [helpOpen,setHelpOpen]=useState(false);
+  const [refreshInterval,setRefreshInterval]=useState(()=>{
+    try { const v = parseInt(localStorage.getItem("bookbot_dash_refresh")||"30000",10); return isNaN(v)?30000:v; } catch { return 30000; }
+  });
+  useEffect(()=>{ try { localStorage.setItem("bookbot_dash_refresh",String(refreshInterval)); } catch {} },[refreshInterval]);
+
+  const showToast=(msg,type="ok")=>setToast({msg,type});
+
+  // tab ref للـ lazy load داخل useCallback
+  const tabRef=useRef("overview");
+  useEffect(()=>{tabRef.current=tab;},[tab]);
+
+  const loadAll=useCallback(async()=>{
+    // ── Core data (دائماً) ───────────────────
+    const [r1,r2,r3,r4,r5,r6]=await Promise.allSettled([
+      loadOv(),loadBooks(),loadSrc(),loadDLQ(),loadPrem(),loadBanned()
+    ]);
+    if(r1.status==="fulfilled")setOv(r1.value);
+    if(r2.status==="fulfilled")setBooks(r2.value);
+    if(r3.status==="fulfilled")setSources(r3.value);
+    if(r4.status==="fulfilled")setDlq(r4.value);
+    if(r5.status==="fulfilled")setPrem(r5.value);
+    if(r6.status==="fulfilled")setBanned(r6.value);
+
+    // ── Telemetry: فقط لما tab مفتوح ────────
+    if(tabRef.current==="telemetry"){
+      const [rt,rf]=await Promise.allSettled([loadTraces(),loadFunnel()]);
+      if(rt.status==="fulfilled")setTraces(rt.value);
+      if(rf.status==="fulfilled")setFunnel(rf.value);
+    }
+
+    // ── All users: فقط لما users tab مفتوح ──
+    if(tabRef.current==="users"){
+      const r=await apiFetch("users/all?limit=200").catch(()=>null);
+      if(r)setAllUsers(r);
+    }
+
+    // ── Cached books: فقط لما cache tab مفتوح ──
+    if(tabRef.current==="cache"){
+      const r=await apiFetch("db/cached-books?limit=300").catch(()=>null);
+      if(r)setCacheBooks(r);
+    }
+
+    // ── Recent searches: فقط لما recent tab مفتوح ──
+    if(tabRef.current==="recent"){
+      const r=await apiFetch("db/recent-searches?limit=100").catch(()=>null);
+      if(r)setRecent(r);
+    }
+
+    // ── DASH 2.0: Logs tab يحتاج refresh على كل tick ──
+    if(tabRef.current==="logs"){
+      const r=await loadLogs(300).catch(()=>null);
+      if(r)setLogs(r);
+    }
+
+    // ── DASH 2.0: Costs widget في overview tab ──
+    if(tabRef.current==="overview"){
+      const r=await loadCosts().catch(()=>null);
+      if(r)setCosts(r);
+    }
+
+    // ── DASH 2.0: Backup card في system tab ──
+    if(tabRef.current==="system"){
+      const r=await loadBackup().catch(()=>null);
+      if(r)setBackup(r);
+    }
+
+    // ── DASH 2.0: Background log poll للـ notification bell (50 سطر فقط) ──
+    // كل 60 ثانية حتى لو لم نكن في logs tab — عشان الجرس يحدّث الـ badge.
+    const r = await loadLogs(50).catch(()=>null);
+    if(r) setBgLogs(r);
+
+    setIsMock(_mock);
+    setTs(Date.now());
+  },[]);
+
+  // لما يفتح telemetry tab لأول مرة، اجلب البيانات فوراً
+  const prevTabRef=useRef("overview");
+  useEffect(()=>{
+    if(tab==="telemetry"&&prevTabRef.current!=="telemetry"){
+      Promise.allSettled([loadTraces(),loadFunnel()]).then(([rt,rf])=>{
+        if(rt.status==="fulfilled")setTraces(rt.value);
+        if(rf.status==="fulfilled")setFunnel(rf.value);
+      });
+    }
+    // لما يفتح users tab لأول مرة، اجلب كل المستخدمين فوراً
+    if(tab==="users"&&prevTabRef.current!=="users"){
+      apiFetch("users/all?limit=200").then(r=>{if(r)setAllUsers(r);}).catch(()=>{});
+    }
+    if(tab==="cache"&&prevTabRef.current!=="cache"){
+      apiFetch("db/cached-books?limit=300").then(r=>{if(r)setCacheBooks(r);}).catch(()=>{});
+    }
+    if(tab==="recent"&&prevTabRef.current!=="recent"){
+      apiFetch("db/recent-searches?limit=100").then(r=>{if(r)setRecent(r);}).catch(()=>{});
+    }
+    if(tab==="failed"&&prevTabRef.current!=="failed"){
+      apiFetch("db/failed-searches?limit=200").then(r=>{if(r)setFailed(r);}).catch(()=>{});
+    }
+    if(tab==="analytics"&&prevTabRef.current!=="analytics"&&!heatmap){
+      apiFetch("db/hourly-heatmap").then(r=>{if(r)setHeatmap(r);}).catch(()=>{});
+    }
+    // ── DASH 2.0 — fetch immediately when tab opens ──
+    if(tab==="logs"&&prevTabRef.current!=="logs"){
+      loadLogs(300).then(r=>{if(r)setLogs(r);}).catch(()=>{});
+    }
+    if(tab==="system"&&prevTabRef.current!=="system"){
+      loadBackup().then(r=>{if(r)setBackup(r);}).catch(()=>{});
+    }
+    if(tab==="overview"&&prevTabRef.current!=="overview"){
+      loadCosts().then(r=>{if(r)setCosts(r);}).catch(()=>{});
+    }
+    prevTabRef.current=tab;
+  },[tab]);
+
+  useEffect(()=>{
+    loadAll();
+    if(refreshInterval<=0) return; // الإيقاف اليدوي
+    const t=setInterval(loadAll,refreshInterval);
+    return()=>clearInterval(t);
+  },[loadAll,refreshInterval]);
+
+  // ── DASH 2.0: Keyboard shortcuts (Ctrl+K, ?, r, g+letter) ──────
+  useEffect(()=>{
+    const tabIdByKey = {o:"overview",a:"analytics",b:"books",c:"cache",q:"queue",
+                       u:"users",s:"sources",t:"telemetry",l:"logs",m:"system"};
+    let gPending = false;
+    let gTimer = null;
+    const isTyping = () => {
+      const a = document.activeElement;
+      if(!a) return false;
+      const t = (a.tagName||"").toLowerCase();
+      return t==="input"||t==="textarea"||t==="select"||a.isContentEditable;
+    };
+    const onKey = (e)=>{
+      // Ctrl+K / Cmd+K — أفضل ما يكون فعّال حتى أثناء الكتابة
+      if((e.ctrlKey||e.metaKey)&&(e.key==="k"||e.key==="K")){
+        e.preventDefault();
+        setPaletteOpen(o=>!o);
+        return;
+      }
+      if(isTyping()) return;
+      if(e.key==="?"){ e.preventDefault(); setHelpOpen(true); return; }
+      if(e.key==="r"||e.key==="R"){ e.preventDefault(); loadAll(); return; }
+      if(e.key==="Escape"){ setPaletteOpen(false); setHelpOpen(false); return; }
+      if(e.key==="g"||e.key==="G"){
+        gPending = true;
+        if(gTimer) clearTimeout(gTimer);
+        gTimer = setTimeout(()=>{ gPending=false; }, 1000);
+        return;
+      }
+      if(gPending && tabIdByKey[e.key.toLowerCase()]){
+        gPending = false;
+        if(gTimer) clearTimeout(gTimer);
+        setTab(tabIdByKey[e.key.toLowerCase()]);
+        return;
+      }
+    };
+    document.addEventListener("keydown",onKey);
+    return ()=>{ document.removeEventListener("keydown",onKey); if(gTimer) clearTimeout(gTimer); };
+  },[loadAll]);
+
+  useEffect(()=>{
+    const t=setInterval(()=>{
+      const s=Math.floor((Date.now()-ts)/1000);
+      setAgo(s<5?"الآن":s<60?`${s}ث`:`${Math.floor(s/60)}د`);
+    },1000);
+    return()=>clearInterval(t);
+  },[ts]);
+
+  const maintenance=ov?.system?.maintenance;
+
+  const handleToggleMaint=async()=>{
+    await apiAct("PUT","maintenance",{active:!maintenance});
+    showToast(maintenance?"✅ إيقاف الصيانة":"🔴 الصيانة مفعّلة",maintenance?"ok":"warn");
+    loadAll();
+  };
+  const handleClearBL=async()=>{
+    if(!confirm("مسح Blacklist؟"))return;
+    await apiAct("DELETE","blacklist");
+    showToast("✅ تم مسح Blacklist");loadAll();
+  };
+
+  // sidebarOpen: على الموبايل = drawer مفتوح/مقفول. على الديسكتوب = expanded/collapsed.
+  const sidebarOpen = isMobile ? sidebar : true;       // dummy on desktop, always rendered
+  const sidebarWidth = isMobile ? 240 : (sidebar?220:62);
+  const closeSidebar = ()=>setSidebar(false);
+  const toggleSidebar = ()=>setSidebar(p=>!p);
+
+  return h("div",{style:{display:"flex",minHeight:"100vh",background:T.bg,position:"relative"}},
+    // Mobile backdrop
+    isMobile && sidebar && h("div",{className:"sidebar-backdrop",onClick:closeSidebar}),
+    // Sidebar
+    h("div",{className:`sidebar ${isMobile&&!sidebar?"closed":""}`,
+      style:{width:sidebarWidth,background:T.surface,borderLeft:`1px solid ${T.border}`,
+      display:"flex",flexDirection:"column",transition:"width .25s cubic-bezier(.4,0,.2,1)",
+      overflow:"hidden",flexShrink:0,position:isMobile?"fixed":"sticky",top:0,height:"100vh"}},
+      h("div",{style:{padding:"20px 14px 16px",borderBottom:`1px solid ${T.border}`,
+        display:"flex",alignItems:"center",gap:12,overflow:"hidden"}},
+        h("div",{className:"glow",style:{width:42,height:42,borderRadius:12,flexShrink:0,
+          background:`linear-gradient(145deg,${T.gold},${T.goldDim})`,
+          display:"flex",alignItems:"center",justifyContent:"center",fontSize:21,
+          boxShadow:`0 6px 20px ${T.gold}33`}},"📚"),
+        (sidebar||isMobile)&&h("div",{style:{overflow:"hidden",lineHeight:1.35,flex:1}},
+          h("div",{style:{color:T.gold,fontWeight:800,fontSize:14,whiteSpace:"nowrap"}},"خلاصة الكتب"),
+          h("div",{style:{color:T.muted,fontSize:10,whiteSpace:"nowrap",fontWeight:500}},"مركز العمليات")
+        ),
+        // Close button on mobile drawer
+        isMobile && h("button",{onClick:closeSidebar,style:{background:"transparent",border:"none",
+          color:T.muted,fontSize:18,padding:4,cursor:"pointer"}},"✕")
+      ),
+      h("nav",{style:{flex:1,padding:"8px 8px 12px",display:"flex",flexDirection:"column",gap:1,overflowY:"auto"}},
+        (typeof TAB_GROUPS!=="undefined"?TAB_GROUPS:["رئيسي","محتوى","تشغيل","مراقبة"]).flatMap(group=>{
+          const items=TABS.filter(t=>t.group===group);
+          if(!items.length) return [];
+          const nodes=[];
+          if(sidebar||isMobile) nodes.push(h("div",{key:"g-"+group,className:"nav-group-label"},group));
+          items.forEach(t=>nodes.push(
+            h("button",{key:t.id,className:`nav-item ${tab===t.id?"active":""}`,
+              onClick:()=>{ setTab(t.id); if(isMobile) closeSidebar(); }, title:t.label},
+              h("span",{style:{fontSize:17,flexShrink:0,width:22,textAlign:"center"}},t.icon),
+              (sidebar||isMobile)&&h("span",{style:{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},t.label)
+            )
+          ));
+          return nodes;
+        })
+      ),
+      // Footer: logout + collapse toggle
+      h("div",{style:{borderTop:`1px solid ${T.border}`,padding:"8px",display:"flex",flexDirection:"column",gap:4}},
+        (sidebar||isMobile)&&h("button",{className:"btn btn-danger btn-md",onClick:onLogout,style:{width:"100%",justifyContent:"flex-start"}},"🚪  تسجيل خروج"),
+        !isMobile && h("button",{onClick:toggleSidebar,style:{background:"transparent",border:"none",color:T.muted,padding:8,fontSize:14}},sidebar?"◀ طيّ":"▶")
+      )
+    ),
+    // Main
+    h("div",{style:{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0}},
+      // Topbar
+      h("div",{className:"topbar",style:{background:T.surface,borderBottom:`1px solid ${T.border}`,
+        padding:"0 20px",height:56,display:"flex",alignItems:"center",
+        justifyContent:"space-between",flexShrink:0,position:"sticky",top:0,zIndex:100}},
+        h("div",{style:{display:"flex",alignItems:"center",gap:10,minWidth:0,flex:1}},
+          // Hamburger button (mobile only)
+          isMobile && h("button",{onClick:toggleSidebar,"aria-label":"menu",style:{background:"transparent",
+            border:"none",color:T.text,fontSize:22,padding:"4px 8px",cursor:"pointer"}},"☰"),
+          h("span",{className:"topbar-title",style:{fontSize:17,fontWeight:800,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},
+            TABS.find(t=>t.id===tab)?.icon," ",TABS.find(t=>t.id===tab)?.label),
+          maintenance&&h(Tag,{color:T.red},"🔴 صيانة"),
+          isMock&&h(Tag,{color:T.orange},"🟡 بيانات تجريبية")
+        ),
+        h("div",{style:{display:"flex",alignItems:"center",gap:8,flexShrink:0}},
+          !isMock&&h("span",{className:"topbar-status"},h(Tag,{color:T.green,size:11},"🟢 متصل")),
+          h("div",{className:"topbar-status",style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:T.muted}},
+            h(Dot)," ",ago),
+          // DASH 2.0: Auto-refresh control + bell + palette + help
+          !isMobile && h(AutoRefreshControl,{intervalMs:refreshInterval,setIntervalMs:setRefreshInterval,onRefreshNow:loadAll,lastTs:ts}),
+          h(NotificationBell,{logs:bgLogs,onClick:()=>setTab("logs")}),
+          h("button",{onClick:()=>setPaletteOpen(true),title:"قائمة الأوامر (Ctrl+K)",style:{
+            background:"transparent",border:`1px solid ${T.border}`,color:T.muted,
+            width:34,height:34,borderRadius:8,cursor:"pointer",fontSize:14
+          }},"⌨"),
+          h("button",{onClick:()=>setHelpOpen(true),title:"اختصارات (?)",style:{
+            background:"transparent",border:`1px solid ${T.border}`,color:T.muted,
+            width:34,height:34,borderRadius:8,cursor:"pointer",fontSize:14
+          }},"?"),
+          !isMobile && h("div",{className:"tag",style:{background:T.goldDim+"30",border:`1px solid ${T.goldDim}`,
+            color:T.gold,padding:"5px 12px",fontSize:11,fontWeight:700}},"🛡️  أدمن")
+        )
+      ),
+      // Content
+      h("div",{className:"content",style:{flex:1,overflowY:"auto",padding:"22px 18px"}},
+        tab==="overview"  &&h(OverviewTab,{ov,costs}),
+        tab==="analytics" &&h(AnalyticsTab,{weekly:ov?.weekly||[],heatmap}),
+        tab==="books"     &&h(BooksTab,{books}),
+        tab==="failed"    &&h(FailedTab,{failed}),
+        tab==="cache"     &&h(CacheTab,{books:cacheBooks}),
+        tab==="recent"    &&h(RecentTab,{searches:recent}),
+        tab==="sources"   &&h(SourcesTab,{sources}),
+        tab==="queue"     &&h(QueueTab,{queue:ov?.queue,dlq,onToast:showToast,onRefresh:loadAll}),
+        tab==="users"     &&h(UsersTab,{prem,banned,allUsers,onToast:showToast,onRefresh:loadAll,onUserClick:setDrillId}),
+        tab==="system"    &&h(SystemTab,{system:ov?.system,backup,maintenance,onToggleMaint:handleToggleMaint,onClearBL:handleClearBL,onToast:showToast}),
+        tab==="telemetry" &&h(TelemetryTab,{funnel,traces}),
+        tab==="logs"      &&h(LogsTab,{logs,onRefresh:()=>loadLogs(300).then(r=>r&&setLogs(r))})
+      )
+    ),
+    // ── DASH 2.0 overlays ──
+    h(CommandPalette,{open:paletteOpen,onClose:()=>setPaletteOpen(false),
+      onNavigate:(id)=>setTab(id),
+      onAction:(id)=>{
+        if(id==="refresh") loadAll();
+        else if(id==="help") setHelpOpen(true);
+        else if(id.startsWith("user:")) setDrillId(id.slice(5));
+        // trace:<id> — simple navigation to telemetry
+        else if(id.startsWith("trace:")) setTab("telemetry");
+      },
+      users:allUsers, books, traces}),
+    helpOpen && h(HelpModal,{onClose:()=>setHelpOpen(false)}),
+    h(QuickActionsFAB,{onPalette:()=>setPaletteOpen(true),onMaint:handleToggleMaint,maintenance}),
+    toast&&h(Toast,{msg:toast.msg,type:toast.type,onDone:()=>setToast(null)}),
+    drillId&&h(UserModal,{userId:drillId,onClose:()=>setDrillId(null),onAction:async(type,id2)=>{
+      const m={
+        grantPrem:()=>apiAct("POST",`users/${id2}/premium`,{enable:true}),
+        revokePrem:()=>apiAct("POST",`users/${id2}/premium`,{enable:false}),
+        ban:()=>apiAct("POST",`users/${id2}/ban`),
+        unban:()=>apiAct("DELETE",`users/${id2}/ban`),
+      };
+      try{ await m[type]?.(); }catch(e){}
+      const msgs={grantPrem:"⭐ تم منح التميز",revokePrem:"❌ تم إلغاء التميز",ban:"🚫 تم الحظر",unban:"✅ تم رفع الحظر"};
+      showToast(msgs[type]||"تم");
+      setDrillId(null);
+      loadAll();
+    }})
+  );
+}
+
+// ══════════════════════════════════════════════
+// LOGIN SCREEN — يطلب DASHBOARD_SECRET ويحفظه في localStorage
+// ══════════════════════════════════════════════
+function Login({onLogin}){
+  const [val,setVal]=useState("");
+  const [err,setErr]=useState("");
+  const [busy,setBusy]=useState(false);
+  const submit=async(e)=>{
+    e?.preventDefault?.();
+    const t=val.trim();
+    if(!t){ setErr("أدخل مفتاح لوحة الإدارة (Dashboard Secret)"); return; }
+    setBusy(true); setErr("");
+    try{
+      const r=await fetch(`${API_BASE}/api/admin/overview`,{headers:{Authorization:`Bearer ${t}`}});
+      if(r.status===200){ setToken(t); onLogin(); }
+      else if(r.status===401||r.status===403){ setErr("المفتاح غير صحيح — تحقّق من .env"); }
+      else if(r.status===503){ setErr("DASHBOARD_SECRET غير مضبوط على السيرفر"); }
+      else{ setErr(`خطأ غير متوقع (HTTP ${r.status})`); }
+    }catch{ setErr("تعذّر الاتصال بالسيرفر — تأكد أن البوت يعمل"); }
+    finally{ setBusy(false); }
+  };
+  return h("div",{className:"login-shell fade-in"},
+    h("form",{className:"login-card",onSubmit:submit,style:{display:"flex",flexDirection:"column",gap:18}},
+      h("div",{style:{display:"flex",alignItems:"center",gap:14}},
+        h("div",{className:"glow",style:{width:52,height:52,borderRadius:14,
+          background:`linear-gradient(145deg,${T.gold},${T.goldDim})`,
+          display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,
+          boxShadow:`0 8px 28px ${T.gold}40`}},"📚"),
+        h("div",null,
+          h("div",{style:{color:T.gold,fontWeight:800,fontSize:18}},"خلاصة الكتب"),
+          h("div",{style:{color:T.muted,fontSize:12,marginTop:2,fontWeight:500}},"مركز العمليات · لوحة الإدارة")
+        )
+      ),
+      h("div",{style:{height:1,background:`linear-gradient(90deg,transparent,${T.border},transparent)`}}),
+      h("div",null,
+        h("div",{style:{fontSize:14,fontWeight:700,color:T.text,marginBottom:6}},"تسجيل الدخول"),
+        h("div",{style:{fontSize:12,color:T.muted,lineHeight:1.75}},
+          "أدخل ",h("span",{className:"mono",style:{color:T.gold}},"DASHBOARD_SECRET"),
+          " من ملف ",h("span",{className:"mono",style:{color:T.gold}},".env"),
+          " على السيرفر. يُحفظ محلياً في متصفحك فقط."
+        )
+      ),
+      h("div",null,
+        h("label",{style:{display:"block",fontSize:11,fontWeight:600,color:T.muted,marginBottom:8}},"مفتاح الوصول"),
+        h("input",{type:"password",value:val,onChange:e=>setVal(e.target.value),
+          placeholder:"••••••••••••••••",autoFocus:true,autoComplete:"off",
+          style:{direction:"ltr",fontFamily:"'IBM Plex Mono',monospace",fontSize:15,padding:"12px 14px"}})
+      ),
+      err&&h("div",{style:{fontSize:12,color:T.red,background:T.redDim+"40",border:`1px solid ${T.red}40`,
+        padding:"10px 12px",borderRadius:10,lineHeight:1.5}},"❌ ",err),
+      h("button",{type:"submit",className:"btn btn-gold btn-lg",disabled:busy,style:{width:"100%",opacity:busy?.65:1}},
+        busy?"… جاري التحقق":"🔓  دخول آمن"),
+      h("div",{style:{fontSize:10,color:T.muted,textAlign:"center",lineHeight:1.6}},
+        "محمي بمصادقة Bearer · حد معدّل 60 طلب/دقيقة")
+    )
+  );
+}
+
+// ═
+// ROOT — يبدّل بين Login و App بناءً على وجود token
+// ══════════════════════════════════════════════
+class DashErrorBoundary extends React.Component {
+  constructor(p){ super(p); this.state={err:null}; }
+  static getDerivedStateFromError(err){ return {err}; }
+  componentDidCatch(err, info){ try{ console.error("Dashboard crash:", err, info); }catch(e){} }
+  render(){
+    if(this.state.err){
+      const msg = String(this.state.err && (this.state.err.message||this.state.err));
+      return h("div",{style:{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",
+        background:T.bg,color:T.text,padding:24,flexDirection:"column",gap:14,textAlign:"center"}},
+        h("div",{style:{fontSize:40}},"⚠️"),
+        h("div",{style:{fontSize:18,fontWeight:800,color:T.gold}},"تعذّر تحميل لوحة الإدارة"),
+        h("div",{style:{fontSize:12,color:T.muted,maxWidth:420,lineHeight:1.7,direction:"ltr"}}, msg.slice(0,300)),
+        h("button",{className:"btn btn-gold btn-md",onClick:()=>location.reload()},"🔄  إعادة تحميل"),
+        h("button",{className:"btn btn-ghost btn-md",onClick:()=>{ try{localStorage.removeItem(TOKEN_KEY);}catch(e){} location.reload(); }},
+          "🚪  تسجيل خروج وإعادة المحاولة")
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function Root(){
+  const [authed,setAuthed]=useState(()=>!!getToken());
+  useEffect(()=>{
+    setAuthLostHandler(()=>setAuthed(false));
+    return ()=>setAuthLostHandler(null);
+  },[]);
+  if(!authed) return h(Login,{onLogin:()=>setAuthed(true)});
+  return h(DashErrorBoundary,null,
+    h(App,{onLogout:()=>{ setToken(""); setAuthed(false); }})
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(Root));
+</script>
+</body>
+</html>
